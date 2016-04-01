@@ -18,12 +18,19 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooKeeper.States;
 import org.springframework.util.StringUtils;
+ 
 
+/**
+ * 如果设置timeout <= 0 那么客户端会一直阻塞直至连接到ZooKeeper为止。
+ * 如果设置timeout > 0 那么客户端会在设置时间后还没有连接到ZooKeeper而抛出java.net.ConnectException的连接异常
+ * @author Jerry.Zhao
+ *
+ */
 public class ZookeeperConnector {
-
+	
 	private static ZookeeperConnector connector;
 
-	private ZooKeeper zk = null;
+	private ZooKeeper zooKeeper = null;
 	
 	public int ZK_SESSION_TIMEOUT = 5000;
 
@@ -31,89 +38,101 @@ public class ZookeeperConnector {
 	
 	private int timeout = 0;
 	
-	private FutureTask<Boolean> ft = new FutureTask<Boolean>(new Callable<Boolean>() {
-		@Override
-		public Boolean call() throws Exception {
-			long now = System.currentTimeMillis();
-			while((now + timeout*1000) > System.currentTimeMillis() ){
-				if(zk != null && (zk.getState() == States.CONNECTED || zk.getState() == States.CONNECTEDREADONLY)){
-					return false;
-				}
-				TimeUnit.MICROSECONDS.sleep(50);
-				System.out.println("---------------------");
-			}
-			return true;
-		}
-	});
+	private Watcher watcher;
 	
+	private FutureTask<Boolean> ft = new FutureTask<Boolean>(
+			new Callable<Boolean>() {
+				@Override
+				public Boolean call() throws Exception {
+					long _timeout = System.currentTimeMillis() + (timeout * 1000) ; 
+					while (_timeout > System.currentTimeMillis()) {
+						if (zooKeeper != null &&  (zooKeeper.getState() == States.CONNECTED || zooKeeper .getState() == States.CONNECTEDREADONLY) ) {
+							return false; //超出了超时时间还没有连接上服务器，抛出异常
+						}
+						TimeUnit.MICROSECONDS.sleep(50);
+					}
+					return true;
+				}
+			});
 
-	public static ZookeeperConnector getConnector(String address,int timeout) {
+	public static ZookeeperConnector getConnector(String address,int timeout,Watcher watcher) {
 		if (connector == null) {
 			connector = new ZookeeperConnector();
 		}
 		connector.address = address;
 		connector.timeout = timeout;
+		connector.watcher = watcher;
 		connector.connectServer();
 		return connector;
 	}
 	
-	public static ZookeeperConnector getConnector(String address) {
-		if (connector == null) {
-			connector = new ZookeeperConnector();
-		}
-		connector.address = address;
-		connector.connectServer();
-		return connector;
-	}
-	
-
-	private CountDownLatch latch = new CountDownLatch(1);
-	
-	//timeout 超时时间
+	/**
+	 * 连接服务器
+	 * @return 返回ZooKeeper
+	 */
 	private ZooKeeper connectServer() {
 		
-		if(zk !=null && zk.getState() == States.CONNECTED){
-			return zk;
+		//单个计数协作器，当计数后则阻塞方法向下执行
+		CountDownLatch latch = new CountDownLatch(1);
+		
+		//如果zooKeeper对象已经实例过了则直接返回
+		if(zooKeeper !=null && zooKeeper.getState() == States.CONNECTED){
+			return zooKeeper;
 		}
 		
 		try {
-			zk = new ZooKeeper(address, ZK_SESSION_TIMEOUT, new Watcher() {
+			//实例化ZooKeeper
+			zooKeeper = new ZooKeeper(address, ZK_SESSION_TIMEOUT, new Watcher() {
 	            @Override
 	            public void process(WatchedEvent event) {
 	                if (event.getState() == Event.KeeperState.SyncConnected) {
 	                    latch.countDown();
-	                    System.out.println("zookeeper SyncConnected");
-	                }else if(event.getState() == Event.KeeperState.Disconnected){
-	                	System.out.println("zookeeper Disconnected");
+	                }
+	                
+	                if(watcher !=null){
+	                	watcher.process(event);
 	                }
 	            }
 	        });
 			
 			//如果设置超时时间，超时后抛出异常
 			if(timeout > 0){
-				new Thread(ft).start();
-				boolean isTimeout = false;
-				try {
-					isTimeout = ft.get();
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				}
-				
-				if(isTimeout){
-					throw new ConnectException("connect to zookeeper time out ");
-				}
-			}else{
-				//阻塞等待连接为止
+				waitConnect();
+			}
+			
+			//阻塞等待连接为止
+			else{
 				latch.await();
 			}
 			//否则一直等待，直到watcher收到连接成功事件唤醒	
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		return zk;
+		return zooKeeper;
 	}
 
-	public void publish(final String node, final String url,int version) throws Exception {
+	
+	/**
+	 * 等待连接,开启一个子线程判断连接是否超时，超时则抛出错误
+	 * @throws InterruptedException
+	 * @throws ConnectException
+	 */
+	private void waitConnect() throws InterruptedException, ConnectException {
+		new Thread(ft).start();
+		boolean isTimeout = false;
+		try {
+			isTimeout = ft.get(); //阻塞方法，直至子线程返回连接结果
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		if(isTimeout){
+			throw new ConnectException("connect to zookeeper time out ");
+		}
+	}
+	
+	
+	
+	public String publish(final String node, final String url,int version) throws Exception {
 		
 		if(StringUtils.isEmpty(node)){
 			throw new Exception("node name must be not null");
@@ -152,8 +171,7 @@ public class ZookeeperConnector {
 		}
 		
 		String path = zk.create(versionNode + "/TEMP_", url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-//		System.out.println(path);
-		
+		return path;
 	}
 	
 	public String getData(String node,int version) {
@@ -169,7 +187,7 @@ public class ZookeeperConnector {
 				versionNode = rootNode + "/" + version;
 			}
 			
-			List<String> list = zk.getChildren(versionNode, null);
+			List<String> list = zooKeeper.getChildren(versionNode, null);
 			if(list.size() == 0){
 				return null;
 			}
@@ -183,7 +201,7 @@ public class ZookeeperConnector {
 	}
 	
 	private String getStringData(String node) throws KeeperException, InterruptedException{
-		byte[] data = zk.getData(node, false, null);
+		byte[] data = zooKeeper.getData(node, false, null);
 		if(data == null){
 			return null;
 		}

@@ -1,7 +1,11 @@
 package org.xsnake.remote;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
@@ -15,8 +19,7 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  * @author Jerry
  *
  *  等待解决的问题。
- *  1、连接多台zookeeper及测试
- *  2、考虑是否需要用自定义spring标签实现
+ *  1、考虑是否需要用自定义spring标签实现
  *  
  */
 public class RemoteAccessFactory implements ApplicationContextAware{
@@ -25,10 +28,26 @@ public class RemoteAccessFactory implements ApplicationContextAware{
 	private String host;
 	private int port = 12345;
 	private int timeout = 10;
-	private String zookeeper;
+	private String zookeeperAddress;
+	
+	List<RemoteServiceBean> serviceBeanList = new ArrayList<RemoteServiceBean>();
+	
+	ZookeeperConnector connector;
+	
+	public static class RemoteServiceBean{
+		public RemoteServiceBean(Class<?> serviceInterface,String url,int version) {
+			this.serviceInterface = serviceInterface;
+			this.url = url;
+			this.version = version;
+		}
+		Class<?> serviceInterface;
+		String url;
+		int version;
+	}
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
+		
 		//获取到spring管理的所有bean
 		String[] names = applicationContext.getBeanDefinitionNames();
 		
@@ -38,47 +57,47 @@ public class RemoteAccessFactory implements ApplicationContextAware{
 			Object target = ReflectionUtil.getTarget(obj);
 			Remote remote = target.getClass().getAnnotation(Remote.class);
 			if (remote != null) {
-				
 				if(remote.type() == Remote.Type.RMI){
-					
-					Class<?> clazz = exporterService(name, obj, target, remote);
-					
+					Class<?> clazz = getServiceInterface(target, remote);
+					exporterService(name, obj, target, remote, clazz);
 					String url = String.format("rmi://%s:%d/%s", host, port, name);
-					
-					if(zookeeper == null){
+					if(zookeeperAddress == null){
 						throw new BeanCreationException("zookeeper is null ");
 					}
-					
-					ZookeeperConnector connector = ZookeeperConnector.getConnector(zookeeper,timeout);
-					
 					try {
-						
-						connector.publish(clazz.getName(),url,remote.version());
-						
+						RemoteServiceBean serviceBean = new RemoteServiceBean(clazz,url,remote.version());
+						serviceBeanList.add(serviceBean);
 					} catch (Exception e) {
-						
 						e.printStackTrace();
-						
 						throw new BeanCreationException(e.getMessage());
-						
 					}
-					
 				}else{
-					
 					//暂时只支持RMI方式
 				}
-				
+			}
+		}
+		
+		connector = ZookeeperConnector.getConnector(zookeeperAddress,timeout,new Watcher() {
+			@Override
+			public void process(WatchedEvent event) {
+				if (event.getState() == Event.KeeperState.SyncConnected) {
+                   publish();
+                }
+			}
+		});
+	}
+
+	public void publish(){
+		for(RemoteServiceBean bean : serviceBeanList){
+			try {
+				connector.publish(bean.serviceInterface.getName(),bean.url,bean.version);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
-
-	private Class<?> exporterService(String name, Object obj, Object target,Remote remote) {
-		RmiServiceExporter se = new RmiServiceExporter();
-		se.setServiceName(name);
-		se.setService(obj);
-		se.setAlwaysCreateRegistry(alwaysCreateRegistry);
-		alwaysCreateRegistry = false;
-		se.setRegistryPort(port);
+	
+	private Class<?> getServiceInterface(Object target, Remote remote) {
 		Class<?> clazz = remote.serviceInterface();
 		if(clazz == Void.class){
 			try{
@@ -87,6 +106,16 @@ public class RemoteAccessFactory implements ApplicationContextAware{
 				throw new BeanCreationException("RMI remote access bean [" + target.getClass().getName() + "] creation failed ! must implements a interface ");
 			}
 		}
+		return clazz;
+	}
+
+	private Class<?> exporterService(String name, Object obj, Object target,Remote remote,Class<?> clazz) {
+		RmiServiceExporter se = new RmiServiceExporter();
+		se.setServiceName(name);
+		se.setService(obj);
+		se.setAlwaysCreateRegistry(alwaysCreateRegistry);
+		alwaysCreateRegistry = false;
+		se.setRegistryPort(port);
 		se.setServiceInterface(clazz);
 		try {
 			se.afterPropertiesSet();
@@ -115,11 +144,11 @@ public class RemoteAccessFactory implements ApplicationContextAware{
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
 	}
-	public String getZookeeper() {
-		return zookeeper;
+	public String getZookeeperAddress() {
+		return zookeeperAddress;
 	}
-	public void setZookeeper(String zookeeper) {
-		this.zookeeper = zookeeper;
+	public void setZookeeperAddress(String zookeeperAddress) {
+		this.zookeeperAddress = zookeeperAddress;
 	}
 
 }

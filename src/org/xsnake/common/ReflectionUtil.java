@@ -41,11 +41,11 @@ public class ReflectionUtil extends ReflectionUtils {
 
 	public static Object getTarget(Object proxy) {
 		if (!AopUtils.isAopProxy(proxy)) {
-			return proxy;// 不是代理对象
+			return proxy;
 		}
 		if (AopUtils.isJdkDynamicProxy(proxy)) {
 			return getJdkDynamicProxyTargetObject(proxy);
-		} else { // cglib
+		} else {
 			return getCglibProxyTargetObject(proxy);
 		}
 

@@ -24,13 +24,12 @@
    	<bean id="remoteBeanFactory" class="org.xsnake.remote.RemoteAccessFactory" >
    		<property name="host" value="127.0.0.1" /> 
    		<property name="port" value="1235" /> 
-   		<property name="zookeeper" value="127.0.0.1:2181"/>
+   		<property name="zookeeperAddress" value="127.0.0.1:2181"/>
    	</bean>
-   	
 	
 	
 	<bean id="clientAccessFactory" class="org.xsnake.remote.ClientAccessFactory" >
-		<property name="zookeeper" value="127.0.0.1:2181"/>
+		<property name="zookeeperAddress" value="127.0.0.1:2181"/>
 	</bean>
 	
 </beans>
