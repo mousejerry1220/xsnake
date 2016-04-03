@@ -37,6 +37,8 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  *  *3、新增了将服务发布到外网（RMI 内外网的问题）需要配置每个服务器的外网IP
  *  *   需要新增了IP白名单功能。
  *  *   新增了服务端的拦截器链。
+ *  4、瞅瞅 RMI SOCKET 通讯问题 客户端发送验证信息到服务端
+ *  5、考虑控制台单点发布服务，其他节点拷贝并执行
  */
 public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
 	static final int DEFAULT_PORT = 1232;
@@ -57,15 +59,8 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
 		
-		if(host ==null){
-			host = getLocalHost();
-		}
-		
-		if(port == 0){
-			port = getPort(DEFAULT_PORT); 
-		}
-		
-		System.setProperty("java.rmi.server.hostname", host);
+		//初始化RMI参数
+		initRMI();
 		
 		//获取到spring管理的所有bean
 		String[] names = applicationContext.getBeanDefinitionNames();
@@ -81,6 +76,16 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 
 		//初始化ZooKerper连接器
 		initZooKeeper();
+	}
+
+	private void initRMI() {
+		if(host ==null){
+			host = getLocalHost();
+		}
+		if(port == 0){
+			port = getPort(DEFAULT_PORT); 
+		}
+		System.setProperty("java.rmi.server.hostname", host);
 	}
 
 	private void initZooKeeper() {
