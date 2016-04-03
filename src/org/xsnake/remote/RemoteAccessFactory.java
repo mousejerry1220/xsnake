@@ -1,6 +1,10 @@
 package org.xsnake.remote;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
@@ -35,12 +39,12 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  *  *   新增了服务端的拦截器链。
  */
 public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
-
+	static final int DEFAULT_PORT = 1232;
 	private static final long serialVersionUID = 1L;
 	private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessFactory.class) ;
 	private boolean alwaysCreateRegistry = true;
 	private String host;
-	private int port = 12345;
+	private int port = 0;
 	private int timeout = 10;
 	private String zookeeperAddress;
 	List<RemoteServiceBean> serviceBeanList = new ArrayList<RemoteServiceBean>();
@@ -48,11 +52,21 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	private List<String> trustAddress; //信任的IP地址过滤列表
 	private List<String> interceptors;
 	
-	
 	List<XSnakeInterceptor> interceptorList = new ArrayList<XSnakeInterceptor>();
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
+		
+		if(host ==null){
+			host = getLocalHost();
+		}
+		
+		if(port == 0){
+			port = getPort(DEFAULT_PORT); 
+		}
+		
+		System.setProperty("java.rmi.server.hostname", host);
+		
 		//获取到spring管理的所有bean
 		String[] names = applicationContext.getBeanDefinitionNames();
 
@@ -139,7 +153,6 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		}
 	}
 	
-
 	private void exportService(RemoteServiceBean bean,RMIServerSocketFactory server,RMIClientSocketFactory client){//String name, Object obj, Object target,Remote remote,Class<?> clazz) {
 		RmiServiceExporter se = new RmiServiceExporter();
 		se.setServiceName(bean.name);
@@ -196,5 +209,37 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	public void setInterceptors(List<String> interceptors) {
 		this.interceptors = interceptors;
 	}
+	
+	
 
+	private String getLocalHost() {
+		try {
+			return InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			throw new BeanCreationException("创建对象失败，无法自动获取主机地址，请配置");
+		}
+		
+	}
+	
+	public int getPort(int port) {
+		ServerSocket ss = null;
+		try{
+			 ss = new ServerSocket(port);
+		}catch(Exception e){
+			port = port + 1;
+			return getPort(port);
+		}finally{
+			try {
+				if(ss!=null){
+					ss.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return port;
+	}
+
+	
 }

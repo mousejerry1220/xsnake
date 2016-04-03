@@ -167,12 +167,12 @@ public class ZookeeperConnector {
 		
 		createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
 		createDirNode(rootNode,null,CreateMode.PERSISTENT);
-		createDirNode(versionNode,null,CreateMode.PERSISTENT);
-		createDirNode(maxVersionNode,String.valueOf(version).getBytes(),CreateMode.PERSISTENT);
+		createDirNode(versionNode,null,CreateMode.EPHEMERAL);
+		createDirNode(maxVersionNode,String.valueOf(version).getBytes(),CreateMode.EPHEMERAL);
 		
 		maxVersion = getStringData(maxVersionNode);
 		if(Integer.parseInt(maxVersion) < version){
-			createNode(maxVersionNode, String.valueOf(version).getBytes(), CreateMode.PERSISTENT);
+			createNode(maxVersionNode, String.valueOf(version).getBytes(), CreateMode.EPHEMERAL);
 		}
 		
 		String path = zk.create(versionNode + "/TEMP_", url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
