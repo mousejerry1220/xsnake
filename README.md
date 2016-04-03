@@ -2,7 +2,7 @@
 
 #源码打包下载包含libs   http://pan.baidu.com/s/1nvByXrb
 #XSnake-1.01.jar下载    http://pan.baidu.com/s/1nv2B1FF
-demo：
+#demo：
 1、在application-context.xml中配置XSnake的启动类
 ```
 <bean id="remoteBeanFactory" class="org.xsnake.remote.RemoteAccessFactory" >
