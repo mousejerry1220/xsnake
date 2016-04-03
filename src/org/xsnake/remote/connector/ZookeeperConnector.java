@@ -51,7 +51,7 @@ public class ZookeeperConnector {
 						}
 						TimeUnit.MICROSECONDS.sleep(50);
 					}
-					return true;
+					return true;//连接成功
 				}
 			});
 
@@ -82,18 +82,7 @@ public class ZookeeperConnector {
 		
 		try {
 			//实例化ZooKeeper
-			zooKeeper = new ZooKeeper(address, ZK_SESSION_TIMEOUT, new Watcher() {
-	            @Override
-	            public void process(WatchedEvent event) {
-	                if (event.getState() == Event.KeeperState.SyncConnected) {
-	                    latch.countDown();
-	                }
-	                
-	                if(watcher !=null){
-	                	watcher.process(event);
-	                }
-	            }
-	        });
+			createZooKeeper(latch);
 			
 			//如果设置超时时间，超时后抛出异常
 			if(timeout > 0){
@@ -109,6 +98,26 @@ public class ZookeeperConnector {
 			e.printStackTrace();
 		}
 		return zooKeeper;
+	}
+
+	private void createZooKeeper(CountDownLatch latch) throws IOException {
+		
+		zooKeeper = new ZooKeeper(address, ZK_SESSION_TIMEOUT, new Watcher() {
+		    @Override
+		    public void process(WatchedEvent event) {
+		        if (event.getState() == Event.KeeperState.SyncConnected) {
+		            latch.countDown();
+		        }
+		        
+		        if(event.getState() == Event.KeeperState.Expired){
+		        	connectServer();
+		        }
+		        
+		        if(watcher !=null){
+		        	watcher.process(event);
+		        }
+		    }
+		});
 	}
 
 	
@@ -131,7 +140,14 @@ public class ZookeeperConnector {
 	}
 	
 	
-	
+	/**
+	 * 发布服务信息到ZooKeeper
+	 * @param node
+	 * @param url
+	 * @param version
+	 * @return
+	 * @throws Exception
+	 */
 	public String publish(final String node, final String url,int version) throws Exception {
 		
 		if(StringUtils.isEmpty(node)){
@@ -142,51 +158,53 @@ public class ZookeeperConnector {
 			throw new Exception("url must be not null");
 		}
 		
-		String rootNode = "/"+node;
-		
 		ZooKeeper zk = connectServer(); // 连接 ZooKeeper 服务器并获取 ZooKeeper 对象
-
-		if(zk == null){
-			throw new Exception(" zookeeper connect failed !");
-		}
-		
-		if(zk.exists(rootNode, null)==null){
-			zk.create(rootNode, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-		}
-		
+		String xsnakeNode = "/xsnake";
+		String rootNode = xsnakeNode + "/"+node;
 		String versionNode = rootNode + "/"+version;
 		String maxVersionNode = rootNode + "/maxVersion";
 		String maxVersion = null;
-		if(zk.exists(versionNode, null) == null){
-			zk.create(versionNode, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-			
-			if(zk.exists(maxVersionNode, null) == null){
-				zk.create(maxVersionNode, String.valueOf(version).getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-			}
-			
-			maxVersion = getStringData(maxVersionNode);
-			if(Integer.parseInt(maxVersion) < version){
-				zk.create(maxVersionNode, String.valueOf(version).getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-			}
+		
+		createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
+		createDirNode(rootNode,null,CreateMode.PERSISTENT);
+		createDirNode(versionNode,null,CreateMode.PERSISTENT);
+		createDirNode(maxVersionNode,String.valueOf(version).getBytes(),CreateMode.PERSISTENT);
+		
+		maxVersion = getStringData(maxVersionNode);
+		if(Integer.parseInt(maxVersion) < version){
+			createNode(maxVersionNode, String.valueOf(version).getBytes(), CreateMode.PERSISTENT);
 		}
 		
 		String path = zk.create(versionNode + "/TEMP_", url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+		System.out.println(path);
 		return path;
+	}
+	
+	//创建一个Node，如果存在则删除后创建
+	private void createNode(String node,byte[] data,CreateMode mode) throws KeeperException, InterruptedException{
+		ZooKeeper zk = connectServer();
+		if(zk.exists(node, null)!=null){
+			zk.delete(node,-1);
+		}
+		zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
+	}
+	
+	//如果不存在则创建，存在则不创建
+	private void createDirNode(String node,byte[] data,CreateMode mode) throws KeeperException, InterruptedException{
+		ZooKeeper zk = connectServer();
+		if(zk.exists(node, null)==null){
+			zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
+		}
 	}
 	
 	public String getData(String node,int version) {
 		try {
-			
-			String rootNode = "/"+node;
+			String xsnakeNode = "/xsnake";
+			String rootNode = xsnakeNode+"/"+node;
 			String maxVersionNode = rootNode + "/maxVersion";
-			String versionNode = null;
 			String maxVersion = getStringData(maxVersionNode);
-			if(version == 0){
-				versionNode = rootNode + "/" + maxVersion;
-			}else{
-				versionNode = rootNode + "/" + version;
-			}
-			
+			String versionNode = ( version == 0 ? rootNode + "/" + maxVersion : rootNode + "/" + version);
+
 			List<String> list = zooKeeper.getChildren(versionNode, null);
 			if(list.size() == 0){
 				return null;

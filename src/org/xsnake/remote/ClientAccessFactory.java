@@ -15,7 +15,7 @@ public class ClientAccessFactory {
 
 	private String zookeeperAddress;
 	
-	private int timeout;
+	private int timeout = 5; //默认5秒超时
 	
 	public ClientAccessFactory(){}
 	
@@ -25,11 +25,7 @@ public class ClientAccessFactory {
 	}
 	
 	public ClientAccessFactory(String zookeeperAddress){
-		
 		this.zookeeperAddress = zookeeperAddress;
-		
-		this.timeout = 5;
-		
 	}
 
 	/**
@@ -51,25 +47,15 @@ public class ClientAccessFactory {
 	
 	@SuppressWarnings("unchecked")
 	public <T> T getServiceBean(Class<T> interfaceService,int version){
-		
 		ZookeeperConnector zc = ZookeeperConnector.getConnector(zookeeperAddress,timeout,null);
-		
 		String path = zc.getData(interfaceService.getName(),version);
-		
 		if(path == null){
-			
 			throw new BeanCreationException("create remote object failed , no server in the service");
-			
 		}
-		
 		RmiProxyFactoryBean c = new RmiProxyFactoryBean();
-		
 		c.setServiceInterface(interfaceService);
-		
 		c.setServiceUrl(path);
-		
 		c.afterPropertiesSet();
-		
 		return (T)c.getObject();
 	}
 

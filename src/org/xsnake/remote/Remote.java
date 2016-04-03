@@ -15,7 +15,17 @@ import org.springframework.stereotype.Component;
 public @interface Remote {
 
 	public static enum Type{
-		RMI,WebService
+		RMI{
+			@Override
+			public String toString() {
+				return "RMI";
+			}
+		},WebService{
+			@Override
+			public String toString() {
+				return "WebService";
+			}
+		}
 	}
 	
 	Class<?> serviceInterface() default Void.class;

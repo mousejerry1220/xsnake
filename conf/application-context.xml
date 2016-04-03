@@ -22,14 +22,27 @@
 	<context:annotation-config />
 	
    	<bean id="remoteBeanFactory" class="org.xsnake.remote.RemoteAccessFactory" >
-   		<property name="host" value="127.0.0.1" /> 
-   		<property name="port" value="1235" /> 
-   		<property name="zookeeperAddress" value="127.0.0.1:2181"/>
+   		<property name="host" value="127.0.0.1" />
+   		<property name="port" value="1234" />
+   		<property name="zookeeperAddress" value="127.0.0.1:2181" />
+		<!-- 客户端与服务端在同一服务器时，过滤不生效 。IP可以是正则表达式-->
+<!--    		<property name="trustAddress"> -->
+<!-- 			<array> -->
+<!-- 				<value>192.168.0.*</value>  -->
+<!-- 			</array> -->
+<!--    		</property> -->
+
+		<property name="interceptors">
+			<array>
+				<value>xmouse.TestAop</value> 
+				<value>xmouse.TestAop2</value> 
+			</array>
+		</property>
    	</bean>
 	
 	
-	<bean id="clientAccessFactory" class="org.xsnake.remote.ClientAccessFactory" >
-		<property name="zookeeperAddress" value="127.0.0.1:2181"/>
-	</bean>
+<!-- 	<bean id="clientAccessFactory" class="org.xsnake.remote.ClientAccessFactory" > -->
+<!-- 		<property name="zookeeperAddress" value="127.0.0.1:2181"/> -->
+<!-- 	</bean> -->
 	
 </beans>
