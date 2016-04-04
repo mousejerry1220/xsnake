@@ -39,6 +39,8 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  *  *   新增了服务端的拦截器链。
  *  4、瞅瞅 RMI SOCKET 通讯问题 客户端发送验证信息到服务端
  *  5、考虑控制台单点发布服务，其他节点拷贝并执行
+ *  6、缓存问题，ZooKeeper节点变化时候更新本地缓存，否则只拿本地缓存 
+ *  7、把IP白名单的设置要放到ZooKeeper上
  */
 public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
 	static final int DEFAULT_PORT = 1232;
@@ -108,7 +110,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 			Remote remote = target.getClass().getAnnotation(Remote.class);
 			if (remote != null) {
 				if(remote.type() == Remote.Type.RMI){
-					serviceBeanList.add(RemoteServiceBean.createServiceBean(name,obj,target));
+					serviceBeanList.add(RemoteServiceBean.createServiceBean(obj,target));
 				}else{
 					throw new BeanCreationException(" no support ["
 							+ remote.type()

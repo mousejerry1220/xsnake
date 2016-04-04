@@ -1,5 +1,7 @@
 package org.xsnake.remote;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.BeanCreationException;
 
 public class RemoteServiceBean {
@@ -11,17 +13,17 @@ public class RemoteServiceBean {
 	Class<?> serviceInterface;
 	int version = 0;
 
-	private RemoteServiceBean(String name, Object proxyObject,Object targetObject) {
+	private RemoteServiceBean( Object proxyObject,Object targetObject) {
 		this.target = targetObject;
 		this.remote = target.getClass().getAnnotation(Remote.class);
 		this.version = remote.version();
-		this.name = name;
+		this.name = UUID.randomUUID().toString();
 		this.proxy = proxyObject;
 		this.serviceInterface = getServiceInterface(target, remote);
 	}
 	
-	public static RemoteServiceBean createServiceBean(String name, Object proxyObject,Object targetObject){
-		return new RemoteServiceBean(name, proxyObject, targetObject);
+	public static RemoteServiceBean createServiceBean(Object proxyObject,Object targetObject){
+		return new RemoteServiceBean(proxyObject, targetObject);
 	}
 
 	private Class<?> getServiceInterface(Object target, Remote remote) {

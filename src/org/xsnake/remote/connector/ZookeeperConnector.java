@@ -3,6 +3,7 @@ package org.xsnake.remote.connector;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -157,17 +158,20 @@ public class ZookeeperConnector {
 		if(StringUtils.isEmpty(url)){
 			throw new Exception("url must be not null");
 		}
+
 		
 		ZooKeeper zk = connectServer(); // 连接 ZooKeeper 服务器并获取 ZooKeeper 对象
 		String xsnakeNode = "/xsnake";
-		String rootNode = xsnakeNode + "/"+node;
+		String serviceNode = xsnakeNode +"/service";
+		String rootNode = serviceNode+ "/"+node;
 		String versionNode = rootNode + "/"+version;
 		String maxVersionNode = rootNode + "/maxVersion";
 		String maxVersion = null;
 		
 		createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
+		createDirNode(serviceNode,null,CreateMode.PERSISTENT);
 		createDirNode(rootNode,null,CreateMode.PERSISTENT);
-		createDirNode(versionNode,null,CreateMode.EPHEMERAL);
+		createDirNode(versionNode,null,CreateMode.PERSISTENT);
 		createDirNode(maxVersionNode,String.valueOf(version).getBytes(),CreateMode.EPHEMERAL);
 		
 		maxVersion = getStringData(maxVersionNode);
@@ -175,7 +179,7 @@ public class ZookeeperConnector {
 			createNode(maxVersionNode, String.valueOf(version).getBytes(), CreateMode.EPHEMERAL);
 		}
 		
-		String path = zk.create(versionNode + "/TEMP_", url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+		String path = zk.create(versionNode + "/"+UUID.randomUUID().toString(), url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
 		System.out.println(path);
 		return path;
 	}
@@ -200,7 +204,8 @@ public class ZookeeperConnector {
 	public String getData(String node,int version) {
 		try {
 			String xsnakeNode = "/xsnake";
-			String rootNode = xsnakeNode+"/"+node;
+			String serviceNode = xsnakeNode +"/service";
+			String rootNode = serviceNode+"/"+node;
 			String maxVersionNode = rootNode + "/maxVersion";
 			String maxVersion = getStringData(maxVersionNode);
 			String versionNode = ( version == 0 ? rootNode + "/" + maxVersion : rootNode + "/" + version);
