@@ -1,6 +1,6 @@
 # xsnake
 
-#源码打包下载包（含libs）   http://pan.baidu.com/s/1nvByXrb
+#源码打包下载包（含libs）   http://pan.baidu.com/s/1jIvWbsy
 #XSnake-1.01.jar下载    http://pan.baidu.com/s/1bpDLnAZ
 #ZooKeeper3.4.5 下载    http://pan.baidu.com/s/1nv3r3ip
 #demo：
