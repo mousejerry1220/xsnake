@@ -1,13 +1,50 @@
 # xsnake
 
-#源码打包下载包含libs   http://pan.baidu.com/s/1nvByXrb
-#XSnake-1.01.jar下载    http://pan.baidu.com/s/1nv2B1FF
+#源码打包下载包（含libs）   http://pan.baidu.com/s/1nvByXrb
+#XSnake-1.01.jar下载    http://pan.baidu.com/s/1bpDLnAZ
+#ZooKeeper3.4.5 下载    http://pan.baidu.com/s/1nv3r3ip
 #demo：
 1、在application-context.xml中配置XSnake的启动类
 ```
-<bean id="remoteBeanFactory" class="org.xsnake.remote.RemoteAccessFactory" >
-   <property name="zookeeperAddress" value="127.0.0.1:2181" />
-</bean>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd" >
+	
+	<context:component-scan base-package="xmouse" >
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+	
+   	<bean id="remoteBeanFactory" class="org.xsnake.remote.RemoteAccessFactory" >
+<!--    如果有外网地址请配置，否则可以省略 -->
+<!--    <property name="host" value="127.0.0.1" />   --> 
+<!-- 	如果不配置RMI端口，则启用递增分配，递增从1232开始	 -->
+<!--    <property name="port" value="1234" /> -->
+   		<property name="zookeeperAddress" value="127.0.0.1:2181" />
+		<!-- 客户端与服务端在同一服务器时，过滤不生效 。IP可以是正则表达式-->
+<!--    	<property name="trustAddress"> -->
+<!-- 			<array> -->
+<!-- 				<value>192.168.0.*</value>  -->
+<!-- 			</array> -->
+<!--    	</property> -->
+
+<!-- 		服务拦截器 -->
+<!-- 		<property name="interceptors"> -->
+<!-- 			<array> -->
+<!-- 				<value>xmouse.TestAop</value>  -->
+<!-- 				<value>xmouse.TestAop2</value>  -->
+<!-- 			</array> -->
+<!-- 		</property> -->
+   	</bean>
+	
+</beans>
  ```
 
   2、定义接口类
