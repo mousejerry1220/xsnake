@@ -1,8 +1,5 @@
 # xsnake
-
-#源码打包下载包（含libs）   http://pan.baidu.com/s/1jIvWbsy
-#XSnake-1.01.jar下载    http://pan.baidu.com/s/1bpDLnAZ
-#ZooKeeper3.4.5 下载    http://pan.baidu.com/s/1nv3r3ip
+#XSnake-1.10.jar（JDK1.7编译）  下载地址：http://pan.baidu.com/s/1jItUlkM  
 #demo：
 1、在application-context.xml中配置XSnake的启动类
 ```
@@ -22,20 +19,21 @@
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
 	</context:component-scan>
 	
-   	<bean id="remoteBeanFactory" class="org.xsnake.remote.RemoteAccessFactory" >
+   	<bean id="remoteBeanFactory" class="org.xsnake.remote.server.RemoteAccessFactory" >
+   		<property name="zookeeperAddress" value="127.0.0.1:2181" />
 <!--    如果有外网地址请配置，否则可以省略 -->
 <!--    <property name="host" value="127.0.0.1" />   --> 
 <!-- 	如果不配置RMI端口，则启用递增分配，递增从1232开始	 -->
 <!--    <property name="port" value="1234" /> -->
-   		<property name="zookeeperAddress" value="127.0.0.1:2181" />
-		<!-- 客户端与服务端在同一服务器时，过滤不生效 。IP可以是正则表达式-->
+<!-- 	验证配置 ,如果开启了验证，那么客户端必须要在classpath根目录放一个auth.properties文件，其中存放username和password的登录信息-->
+<!--    <property name="authenticationInterface" value="xmouse.TestAuth"></property> -->
+<!-- 	客户端与服务端在同一服务器时，过滤不生效 。IP可以是正则表达式-->
 <!--    	<property name="trustAddress"> -->
 <!-- 			<array> -->
 <!-- 				<value>192.168.0.*</value>  -->
 <!-- 			</array> -->
 <!--    	</property> -->
-
-<!-- 		服务拦截器 -->
+<!-- 	服务拦截器 -->
 <!-- 		<property name="interceptors"> -->
 <!-- 			<array> -->
 <!-- 				<value>xmouse.TestAop</value>  -->
