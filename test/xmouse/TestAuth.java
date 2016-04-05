@@ -1,6 +1,6 @@
 package xmouse;
 
-import org.xsnake.remote.XSnakeRMIAuthentication;
+import org.xsnake.remote.server.XSnakeRMIAuthentication;
 
 public class TestAuth implements XSnakeRMIAuthentication{
 

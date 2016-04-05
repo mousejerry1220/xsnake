@@ -1,4 +1,4 @@
-package org.xsnake.remote;
+package org.xsnake.remote.server;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

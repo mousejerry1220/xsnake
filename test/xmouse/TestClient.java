@@ -1,6 +1,6 @@
 package xmouse;
 
-import org.xsnake.remote.ClientAccessFactory;
+import org.xsnake.remote.client.ClientAccessFactory;
 
 public class TestClient {
 

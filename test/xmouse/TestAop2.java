@@ -2,7 +2,7 @@ package xmouse;
 
 import java.lang.reflect.Method;
 
-import org.xsnake.remote.XSnakeAbstactInterceptor;
+import org.xsnake.remote.server.XSnakeAbstactInterceptor;
 
 public class TestAop2 extends XSnakeAbstactInterceptor{
 

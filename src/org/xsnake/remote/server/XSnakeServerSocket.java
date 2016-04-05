@@ -1,4 +1,4 @@
-package org.xsnake.remote;
+package org.xsnake.remote.server;
 
 import java.io.DataInputStream;
 import java.io.IOException;
