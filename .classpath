@@ -37,5 +37,6 @@
 	<classpathentry kind="lib" path="lib/spring-web-4.2.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring-webmvc-4.2.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/zookeeper-3.4.5.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-5.1.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

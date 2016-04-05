@@ -26,21 +26,17 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)throws Throwable {
-		
 		if(interceptorList !=null){
 			for(XSnakeInterceptor interceptor : interceptorList){
 				interceptor.before(info,targetObject, method, args);
 			}
 		}
-		
 		Object result = method.invoke(targetObject, args);
-		
 		if(interceptorList !=null){
 			for(XSnakeInterceptor interceptor : interceptorList){
 				interceptor.after(info,targetObject, method, args,result);
 			}
 		}
-		
 		return result;
 	}
 

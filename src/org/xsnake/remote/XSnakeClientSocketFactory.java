@@ -17,7 +17,7 @@ public class XSnakeClientSocketFactory implements RMIClientSocketFactory, Serial
 
 	@Override
 	public Socket createSocket(String host, int port) throws IOException {
-		Socket socket = new Socket(host, port);
+		Socket socket = new XSnakeClientSocket(host, port);
 		OutputStream out = null;
 		URL url = XSnakeClientSocketFactory.class.getResource("/auth.properties");
 		String data = null;

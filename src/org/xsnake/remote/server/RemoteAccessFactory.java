@@ -8,9 +8,11 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.zookeeper.CreateMode;
@@ -18,11 +20,16 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.remoting.rmi.RmiServiceExporter;
+import org.xsnake.admin.dao.BaseDaoUtil;
+import org.xsnake.admin.dao.ConnectionPool;
+import org.xsnake.admin.dao.XSnakeAdminConfiguration;
 import org.xsnake.common.ReflectionUtil;
 import org.xsnake.remote.XSnakeClientSocketFactory;
 import org.xsnake.remote.XSnakeRMIAuthentication;
@@ -51,7 +58,7 @@ import org.xsnake.remote.connector.ZookeeperConnector;
 public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
 	static final int DEFAULT_PORT = 1232;
 	private static final long serialVersionUID = 1L;
-//	private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessFactory.class) ;
+	private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessFactory.class) ;
 	private boolean alwaysCreateRegistry = true;
 	private String host;
 	private int port = 0;
@@ -65,6 +72,8 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	
 	XSnakeRMIAuthentication authentication;
 	String authenticationInterface;
+	
+	XSnakeAdminConfiguration adminDatabaseConfig;
 	
 	private String serverId;
 	
@@ -93,11 +102,31 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 
 		//初始化ZooKerper连接器
 		initZooKeeper();
+
+		//初始化管理配置
+		initAdminConfig();
 		
 		startupUseTime = System.currentTimeMillis() - start;
 		startupDate = new Date();
 		
 		//设置服务信息
+		initServerInfo();
+		
+	}
+
+	private void initAdminConfig() {
+		if(adminDatabaseConfig!=null){
+			try {
+				//单例初始化
+				new ConnectionPool(adminDatabaseConfig);
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+				throw new BeanCreationException(e.getMessage());
+			}
+		}
+	}
+
+	private void initServerInfo() {
 		info.serverId = serverId;
 		info.host = host;
 		info.port = port;
@@ -154,6 +183,9 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				}
 				
 			}
+			
+			
+//			interceptorList.add(null);//添加默认
 		}
 	
 	}
@@ -197,7 +229,6 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	}
 	
 	public void publish(){
-		System.out.println(" xsnake publish service to zookeeper !");
 		for(RemoteServiceBean bean : serviceBeanList){
 			try {
 				String url = String.format("rmi://%s:%d/%s", host, port, bean.name);
@@ -221,7 +252,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 					connector.createNode(maxVersionNode, String.valueOf(version).getBytes(), CreateMode.PERSISTENT);
 				}
 				String path = zk.create(versionNode + "/"+UUID.randomUUID().toString(), url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
-				System.out.println(String.format(" publish [%s] to [%s] version : [%d]",bean.serviceInterface.getName(),path,bean.version));
+				LOG.info(String.format(" publish [%s] to [%s] >> rmi : [%s] version : [%d]",bean.serviceInterface.getName(),path,url,bean.version));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -296,6 +327,13 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	public void setServerId(String serverId) {
 		this.serverId = serverId;
 	}
+	public XSnakeAdminConfiguration getAdminDatabaseConfig() {
+		return adminDatabaseConfig;
+	}
+	public void setAdminDatabaseConfig(XSnakeAdminConfiguration adminDatabaseConfig) {
+		this.adminDatabaseConfig = adminDatabaseConfig;
+	}
+
 
 	private String getLocalHost() {
 		try {

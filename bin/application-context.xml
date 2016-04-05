@@ -37,6 +37,17 @@
 <!-- 				<value>xmouse.TestAop2</value>  -->
 <!-- 			</array> -->
 <!-- 		</property> -->
+		<property name="adminDatabaseConfig" ref="adminDatabaseConfig" />
    	</bean>
+   	
+	<bean id="adminDatabaseConfig" class="org.xsnake.admin.dao.XSnakeAdminConfiguration">
+		<property name="maxSize" value="20" />
+		<property name="initSize" value="5" />
+		<property name="minSize" value="5" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/joker?useUnicode=true&amp;charaterEncoding=utf-8" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
 	
 </beans>
