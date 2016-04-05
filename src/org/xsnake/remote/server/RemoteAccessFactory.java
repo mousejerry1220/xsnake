@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.remoting.rmi.RmiServiceExporter;
 import org.xsnake.common.ReflectionUtil;
 import org.xsnake.remote.XSnakeClientSocketFactory;
+import org.xsnake.remote.XSnakeRMIAuthentication;
 import org.xsnake.remote.XSnakeServerSocketFactory;
 import org.xsnake.remote.connector.ZookeeperConnector;
 

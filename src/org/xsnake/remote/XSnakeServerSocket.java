@@ -9,8 +9,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.xsnake.remote.server.XSnakeRMIAuthentication;
  
 public class XSnakeServerSocket extends ServerSocket {
 
@@ -42,7 +40,6 @@ public class XSnakeServerSocket extends ServerSocket {
         		}
         	}
         }
-        
         InputStream in = s.getInputStream();
         DataInputStream data = new DataInputStream(in);
         int length = data.readInt();

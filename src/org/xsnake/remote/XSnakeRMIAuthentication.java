@@ -1,4 +1,4 @@
-package org.xsnake.remote.server;
+package org.xsnake.remote;
 
 public interface XSnakeRMIAuthentication {
 

@@ -1,10 +1,12 @@
-package org.xsnake.remote;
+package org.xsnake.remote.server;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.rmi.server.RMIServerSocketFactory;
 import java.util.List;
+
+import org.xsnake.remote.XSnakeRMIAuthentication;
 
 public class XSnakeServerSocketFactory implements RMIServerSocketFactory , Serializable{
 
