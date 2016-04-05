@@ -11,8 +11,11 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 	
 	Object targetObject;
 	
-	protected XSnakeInterceptorHandler(List<XSnakeInterceptor> interceptorList){
+	String serverId;
+	
+	protected XSnakeInterceptorHandler(String serverId,List<XSnakeInterceptor> interceptorList){
 		this.interceptorList = interceptorList;
+		this.serverId = serverId;
 	}
 
 	public Object createProxy(Object targetObject) {
@@ -26,7 +29,7 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 		
 		if(interceptorList !=null){
 			for(XSnakeInterceptor interceptor : interceptorList){
-				interceptor.before(targetObject, method, args);;
+				interceptor.before(serverId,targetObject, method, args);
 			}
 		}
 		
@@ -34,7 +37,7 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 		
 		if(interceptorList !=null){
 			for(XSnakeInterceptor interceptor : interceptorList){
-				interceptor.after(targetObject, method, args,result);
+				interceptor.after(serverId,targetObject, method, args,result);
 			}
 		}
 		

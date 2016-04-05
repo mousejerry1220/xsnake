@@ -15,6 +15,9 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooKeeper.States;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xsnake.remote.server.RemoteAccessFactory;
  
 
 /**
@@ -24,6 +27,8 @@ import org.apache.zookeeper.ZooKeeper.States;
  *
  */
 public class ZookeeperConnector {
+	
+	private final static Logger LOG = LoggerFactory.getLogger(ZookeeperConnector.class) ; 
 	
 	private static ZookeeperConnector connector;
 
@@ -142,6 +147,7 @@ public class ZookeeperConnector {
 			zk.delete(node,-1);
 		}
 		zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
+		LOG.info("创建节点数据："+node + " 内容： "+new String(data));
 	}
 	
 	//如果不存在则创建，存在则不创建
@@ -149,15 +155,21 @@ public class ZookeeperConnector {
 		ZooKeeper zk = connectServer();
 		if(zk.exists(node, null)==null){
 			zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
+			LOG.info("创建目录："+node + (data == null ? "" : " 节点数据："+ new String(data)));
 		}
+		
 	}
 	
-	public String getStringData(String node) throws KeeperException, InterruptedException{
-		byte[] data = zooKeeper.getData(node, false, null);
-		if(data == null){
+	public String getStringData(String node) throws InterruptedException{
+		try{
+			byte[] data = zooKeeper.getData(node, false, null);
+			if(data == null){
+				return null;
+			}
+			return new String(data);
+		}catch(KeeperException e){
 			return null;
 		}
-		return new String(data);
 	}
 
 	public ZooKeeper getZooKeeper() {
