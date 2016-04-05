@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.xsnake.remote.server.XSnakeRMIAuthentication;
  
 public class XSnakeServerSocket extends ServerSocket {
 

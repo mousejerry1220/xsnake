@@ -97,7 +97,7 @@ public class ZookeeperConnector {
 		return zooKeeper;
 	}
 
-	private void createZooKeeper(CountDownLatch latch) throws IOException {
+	private void createZooKeeper(final CountDownLatch latch) throws IOException {
 		
 		zooKeeper = new ZooKeeper(address, ZK_SESSION_TIMEOUT, new Watcher() {
 		    @Override

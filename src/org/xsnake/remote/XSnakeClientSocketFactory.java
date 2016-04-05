@@ -24,10 +24,9 @@ public class XSnakeClientSocketFactory implements RMIClientSocketFactory, Serial
 		if(url != null){
 			String path = url.getFile();
 			File file = new File(path);
-			Properties prop = new Properties();  
-			FileInputStream fis = new FileInputStream(file);  
+			Properties prop = new Properties();
+			FileInputStream fis = new FileInputStream(file);
 			prop.load(fis); 
-			
 			String username = prop.getProperty("username");
 			String password = prop.getProperty("password");
 			data = username + "," + password;

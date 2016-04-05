@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.rmi.server.RMIServerSocketFactory;
 import java.util.List;
 
+import org.xsnake.remote.server.XSnakeRMIAuthentication;
+
 public class XSnakeServerSocketFactory implements RMIServerSocketFactory , Serializable{
 
 	private static final long serialVersionUID = 1L;

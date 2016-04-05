@@ -1,4 +1,4 @@
-package org.xsnake.remote;
+package org.xsnake.remote.client;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
+import org.xsnake.remote.XSnakeException;
 import org.xsnake.remote.connector.ZookeeperConnector;
 
 /**

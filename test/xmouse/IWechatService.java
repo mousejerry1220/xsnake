@@ -1,6 +1,6 @@
 package xmouse;
 
-import org.xsnake.remote.Remote;
+import org.xsnake.remote.server.Remote;
 
 @Remote(version = 1)
 public interface IWechatService {

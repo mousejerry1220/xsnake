@@ -1,7 +1,7 @@
 package xmouse;
 
 import org.springframework.stereotype.Service;
-import org.xsnake.remote.Remote;
+import org.xsnake.remote.server.Remote;
 
 @Service
 //@Remote
