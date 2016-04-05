@@ -10,9 +10,13 @@ import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -55,8 +59,10 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	ZookeeperConnector connector;
 	private List<String> trustAddress; //信任的IP地址过滤列表
 	private List<String> interceptors;
-	
 	List<XSnakeInterceptor> interceptorList = new ArrayList<XSnakeInterceptor>();
+	
+	XSnakeRMIAuthentication authentication;
+	String authenticationInterface;
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
@@ -88,6 +94,21 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 			port = getPort(DEFAULT_PORT); 
 		}
 		System.setProperty("java.rmi.server.hostname", host);
+		
+		//如果配置了身份验证接口
+		if(authenticationInterface !=null){
+			try {
+				Object obj = Class.forName(authenticationInterface).newInstance();
+				if(obj instanceof XSnakeRMIAuthentication){
+					authentication = (XSnakeRMIAuthentication)obj;
+				}else{
+					throw new BeanCreationException("身份验证接口必须实现接口 org.xsnake.remote.XSnakeRMIAuthentication");
+				}
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+				e.printStackTrace();
+				throw new BeanCreationException(e.getMessage());
+			}
+		}
 	}
 
 	private void initZooKeeper() {
@@ -95,7 +116,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 			connector = ZookeeperConnector.getConnector(zookeeperAddress,timeout,new Watcher() {
 				@Override
 				public void process(WatchedEvent event) {
-					if (event.getState() == Event.KeeperState.SyncConnected || event.getState() == Event.KeeperState.Expired) {
+					if (event.getState() == Event.KeeperState.SyncConnected) {
 						publish();
 	                }
 				}
@@ -140,8 +161,8 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	}
 
 	private void exportService(){
-		RMIServerSocketFactory server = new XSnakeSocketFactory(trustAddress);
-		RMIClientSocketFactory client = new XSnakeSocketFactory(trustAddress);
+		RMIServerSocketFactory server = new XSnakeServerSocketFactory(trustAddress,authentication);
+		RMIClientSocketFactory client = new XSnakeClientSocketFactory();
 		for(RemoteServiceBean bean : serviceBeanList){
 			exportService(bean,server,client);
 		}
@@ -152,7 +173,26 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		for(RemoteServiceBean bean : serviceBeanList){
 			try {
 				String url = String.format("rmi://%s:%d/%s", host, port, bean.name);
-				connector.publish(bean.serviceInterface.getName(),url,bean.version);
+				String node = bean.serviceInterface.getName();
+				int version = bean.version;
+				ZooKeeper zk = connector.getZooKeeper(); // 连接 ZooKeeper 服务器并获取 ZooKeeper 对象
+				String xsnakeNode = "/xsnake";
+				String serviceNode = xsnakeNode +"/service";
+				String rootNode = serviceNode+ "/"+node;
+				String versionNode = rootNode + "/"+version;
+				String maxVersionNode = rootNode + "/maxVersion";
+				String maxVersion = null;
+				connector.createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
+				connector.createDirNode(serviceNode,null,CreateMode.PERSISTENT);
+				connector.createDirNode(rootNode,null,CreateMode.PERSISTENT);
+				connector.createDirNode(versionNode,null,CreateMode.PERSISTENT);
+				connector.createDirNode(maxVersionNode,String.valueOf(version).getBytes(),CreateMode.PERSISTENT);
+				
+				maxVersion = connector.getStringData(maxVersionNode);
+				if(Integer.parseInt(maxVersion) < version){
+					connector.createNode(maxVersionNode, String.valueOf(version).getBytes(), CreateMode.PERSISTENT);
+				}
+				zk.create(versionNode + "/"+UUID.randomUUID().toString(), url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
 				LOG.debug(String.format(" publish [%s] to [%s] version : [%d]",bean.serviceInterface.getName(),url,bean.version));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -216,8 +256,12 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	public void setInterceptors(List<String> interceptors) {
 		this.interceptors = interceptors;
 	}
-	
-	
+	public String getAuthenticationInterface() {
+		return authenticationInterface;
+	}
+	public void setAuthenticationInterface(String authenticationInterface) {
+		this.authenticationInterface = authenticationInterface;
+	}
 
 	private String getLocalHost() {
 		try {

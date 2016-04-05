@@ -20,6 +20,8 @@
 <!-- 	如果不配置RMI端口，则启用递增分配，递增从1232开始	 -->
 <!--    <property name="port" value="1234" /> -->
    		<property name="zookeeperAddress" value="127.0.0.1:2181" />
+   		<!-- 验证配置 ,如果开启了验证，那么客户端必须要再classpath根目录放一个auth.properties文件，其中存放username和password的登录信息-->
+   		<property name="authenticationInterface" value="xmouse.TestAuth"></property>
 		<!-- 客户端与服务端在同一服务器时，过滤不生效 。IP可以是正则表达式-->
 <!--    	<property name="trustAddress"> -->
 <!-- 			<array> -->

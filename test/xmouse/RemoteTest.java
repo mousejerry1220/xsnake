@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.xsnake.remote.Remote;
 
 @Service
-@Remote(version = 3)
+@Remote(version = 5)
 public class RemoteTest implements IRemoteTest {
 	
 	public String sayHello(String name) {

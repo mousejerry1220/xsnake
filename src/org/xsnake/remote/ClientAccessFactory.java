@@ -1,5 +1,9 @@
 package org.xsnake.remote;
 
+import java.util.List;
+
+import org.apache.commons.lang.math.RandomUtils;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.xsnake.remote.connector.ZookeeperConnector;
@@ -33,8 +37,8 @@ public class ClientAccessFactory {
 	 * @param interfaceService 接口类型
 	 * @return
 	 */
-	public <T> T getServiceBean(Class<T> interfaceService){
-		return getServiceBean(interfaceService,0);
+	public <T> T getService(Class<T> interfaceService){
+		return getService(interfaceService,0);
 	}
 	
 	/**
@@ -44,11 +48,34 @@ public class ClientAccessFactory {
 	 * @param version 指定版本号
 	 * @return
 	 */
+	public String getData(String node,int version) {
+		ZookeeperConnector connector = ZookeeperConnector.getConnector(zookeeperAddress,timeout,null);
+		try {
+			String xsnakeNode = "/xsnake";
+			String serviceNode = xsnakeNode +"/service";
+			String rootNode = serviceNode+"/"+node;
+			String maxVersionNode = rootNode + "/maxVersion";
+			String maxVersion = connector.getStringData(maxVersionNode);
+			String versionNode = ( version == 0 ? rootNode + "/" + maxVersion : rootNode + "/" + version);
+			List<String> list = connector.getZooKeeper().getChildren(versionNode, null);
+			if(list.size() == 0){
+				return null;
+			}
+			String path = list.get(RandomUtils.nextInt(list.size()));
+			String data = connector.getStringData(versionNode+"/"+path);
+			return data;
+		} catch (KeeperException | InterruptedException e) {
+			e.printStackTrace();
+			if( e instanceof KeeperException){
+				throw new XSnakeException(" XSnake Client Error ! ");
+			}
+		}
+		return null;
+	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T getServiceBean(Class<T> interfaceService,int version){
-		ZookeeperConnector zc = ZookeeperConnector.getConnector(zookeeperAddress,timeout,null);
-		String path = zc.getData(interfaceService.getName(),version);
+	public <T> T getService(Class<T> interfaceService,int version){
+		String path =  getData(interfaceService.getName(),version);
 		if(path == null){
 			throw new BeanCreationException("create remote object failed , no server in the service");
 		}
@@ -62,15 +89,12 @@ public class ClientAccessFactory {
 	public String getZookeeperAddress() {
 		return zookeeperAddress;
 	}
-
 	public void setZookeeperAddress(String zookeeperAddress) {
 		this.zookeeperAddress = zookeeperAddress;
 	}
-
 	public int getTimeout() {
 		return timeout;
 	}
-
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
 	}
