@@ -16,6 +16,8 @@
 	
    	<bean id="remoteBeanFactory" class="org.xsnake.remote.server.RemoteAccessFactory" >
    		<property name="zookeeperAddress" value="127.0.0.1:2181" />
+<!--    给这个服务器起一个ID，如果这个ID为空，默认会使用 host + port 作为它的ID -->
+<!--    <property name="serverId" value="server1" />   --> 		
 <!--    如果有外网地址请配置，否则可以省略 -->
 <!--    <property name="host" value="127.0.0.1" />   --> 
 <!-- 	如果不配置RMI端口，则启用递增分配，递增从1232开始	 -->
