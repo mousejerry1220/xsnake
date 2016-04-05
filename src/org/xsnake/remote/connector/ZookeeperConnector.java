@@ -17,7 +17,6 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooKeeper.States;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
- 
 
 /**
  * 如果设置timeout <= 0 那么客户端会一直阻塞直至连接到ZooKeeper为止。
@@ -156,6 +155,7 @@ public class ZookeeperConnector {
 			zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
 			LOG.info("创建目录："+node + (data == null ? "" : " 节点数据："+ new String(data)));
 		}
+		
 	}
 	
 	public String getStringData(String node) throws InterruptedException{
