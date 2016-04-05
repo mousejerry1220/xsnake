@@ -5,13 +5,15 @@ import java.lang.reflect.Method;
 public class XSnakeAbstactInterceptor implements XSnakeInterceptor {
 
 	@Override
-	public void after(Object target, Method method, Object[] args,Object result) {
-		//to do nothing 
+	public void before(ServerInfo info, Object target, Method method, Object[] args) {
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	@Override
-	public void before(Object target, Method method, Object[] args) {
-		//to do nothing 
+	public void after(ServerInfo info, Object target, Method method, Object[] args, Object result) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

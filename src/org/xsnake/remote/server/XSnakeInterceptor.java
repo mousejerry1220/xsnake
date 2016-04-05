@@ -4,8 +4,8 @@ import java.lang.reflect.Method;
 
 public interface XSnakeInterceptor {
 
-	void before(Object target, Method method, Object[] args);
+	void before(ServerInfo serverInfo,Object target, Method method, Object[] args);
 	
-	void after(Object target, Method method, Object[] args,Object result);
+	void after(ServerInfo serverInfo,Object target, Method method, Object[] args,Object result);
 	
 }
