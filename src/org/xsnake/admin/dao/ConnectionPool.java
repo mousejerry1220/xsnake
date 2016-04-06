@@ -10,7 +10,7 @@ import org.xsnake.remote.XSnakeException;
 
 public class ConnectionPool {
 	
-	private List<XSnakeConnection> pool = new ArrayList<XSnakeConnection>();
+	public List<XSnakeConnection> pool = new ArrayList<XSnakeConnection>();
 	
 	private XSnakeAdminConfiguration config;
 	
@@ -40,17 +40,18 @@ public class ConnectionPool {
 	}
 	
 	public synchronized Connection getConnection() throws SQLException{
-		if(pool.size() >= config.maxSize){
-			while(true){
-				for(XSnakeConnection connection : pool){
-					if(!connection.isLock()){
-						return connection.getConnection();
-					}
+		while(true){
+			for(XSnakeConnection connection : pool){
+				if(!connection.isLock()){
+					return connection.getConnection();
 				}
 			}
-		}else{
-			return createConnection().getConnection();
+			
+			if(pool.size() < config.maxSize){
+				return createConnection().getConnection();
+			}
 		}
+		
 	}
 	
 }

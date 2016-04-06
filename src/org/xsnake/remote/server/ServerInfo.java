@@ -4,15 +4,15 @@ import java.util.Date;
 
 public class ServerInfo {
 	
-	protected String serverId ;
+	protected String serverId ; // 服务器ID
 	
-	protected String host ;
+	protected String host ; //服务器地址
 	
-	protected int port;
+	protected int port;  //服务器端口
 	
-	protected Date startupDate;
+	protected Date startupDate; //服务器运行开始时间
 	
-	protected long startupUseTime;
+	protected long startupUseTime; //服务器启动耗时
 
 	public String getServerId() {
 		return serverId;
