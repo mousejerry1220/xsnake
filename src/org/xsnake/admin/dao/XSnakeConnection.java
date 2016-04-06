@@ -34,6 +34,7 @@ public class XSnakeConnection implements InvocationHandler {
 		//使用连接池，所以调用close方法时候忽略，释放锁
 		if("close".equals(method.getName())){
 			lock = false;
+			System.out.println("--------------------close");
 			return null;
 		}
 		Object result = method.invoke(connection, args);

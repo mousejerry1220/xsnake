@@ -28,13 +28,16 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] args)throws Throwable {
 		if(interceptorList !=null){
 			for(XSnakeInterceptor interceptor : interceptorList){
-				interceptor.before(info,targetObject, method, args);
+				interceptor.before(info,new InvokeInfo (targetObject, method, args,null,-1));
 			}
 		}
+		long start = System.currentTimeMillis();
 		Object result = method.invoke(targetObject, args);
+		long useTime = System.currentTimeMillis() - start;
+		
 		if(interceptorList !=null){
 			for(XSnakeInterceptor interceptor : interceptorList){
-				interceptor.after(info,targetObject, method, args,result);
+				interceptor.after(info,new InvokeInfo(targetObject, method, args,result,useTime));
 			}
 		}
 		return result;

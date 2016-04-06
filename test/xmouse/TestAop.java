@@ -1,19 +1,18 @@
 package xmouse;
 
-import java.lang.reflect.Method;
-
+import org.xsnake.remote.server.InvokeInfo;
 import org.xsnake.remote.server.ServerInfo;
 import org.xsnake.remote.server.XSnakeInterceptor;
 
 public class TestAop implements XSnakeInterceptor {
 
 	@Override
-	public void after(ServerInfo info,Object target, Method method, Object[] args,Object result) {
-		System.out.println(" 来自服务器：" + info.getServerId() + "记录日志" + result);
+	public void after(ServerInfo info,InvokeInfo invokeInfo) {
+		System.out.println(" 来自服务器：" + info.getServerId() + "记录日志" + invokeInfo.getResult());
 	}
 
 	@Override
-	public void before(ServerInfo info,Object target, Method method, Object[] args) {
+	public void before(ServerInfo info,InvokeInfo invokeInfo) {
 		System.out.println("=========================");
 	}
 
