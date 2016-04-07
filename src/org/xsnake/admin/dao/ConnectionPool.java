@@ -20,6 +20,13 @@ public class ConnectionPool {
 		return instance;
 	}
 
+	public void destroy(){
+		for(XSnakeConnection connection : pool){
+			connection.close();	
+		}
+		instance = null;
+	}
+	
 	public ConnectionPool(XSnakeAdminConfiguration config) throws ClassNotFoundException, SQLException {
 		if(instance !=null){
 			throw new XSnakeException("连接池已经初始化过了");

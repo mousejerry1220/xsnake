@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class XSnakeConnection implements InvocationHandler {
 
@@ -34,7 +35,6 @@ public class XSnakeConnection implements InvocationHandler {
 		//使用连接池，所以调用close方法时候忽略，释放锁
 		if("close".equals(method.getName())){
 			lock = false;
-			System.out.println("--------------------close");
 			return null;
 		}
 		Object result = method.invoke(connection, args);
@@ -43,6 +43,15 @@ public class XSnakeConnection implements InvocationHandler {
 
 	public boolean isLock() {
 		return lock;
+	}
+	
+	//释放资源
+	public void close(){
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
