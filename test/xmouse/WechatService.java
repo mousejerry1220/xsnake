@@ -1,9 +1,10 @@
 package xmouse;
 
 import org.springframework.stereotype.Service;
+import org.xsnake.remote.server.Remote;
 
 @Service
-//@Remote
+@Remote
 public class WechatService implements IWechatService {
 
 	@Override

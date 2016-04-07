@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.zookeeper.CreateMode;
@@ -27,7 +26,6 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.remoting.rmi.RmiServiceExporter;
-import org.xsnake.admin.dao.BaseDaoUtil;
 import org.xsnake.admin.dao.ConnectionPool;
 import org.xsnake.admin.dao.XSnakeAdminConfiguration;
 import org.xsnake.common.ReflectionUtil;
@@ -39,7 +37,6 @@ import org.xsnake.remote.connector.ZookeeperConnector;
 /**
  * 
  * @author Jerry.Zhao
- *
  *  等待解决的问题。
  *  1、考虑是否需要用自定义spring标签实现
  *  2、增加页面管理控制台、默认为随机分配模式，
@@ -50,12 +47,21 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  *  *3、新增了将服务发布到外网（RMI 内外网的问题）需要配置每个服务器的外网IP
  *  *   需要新增了IP白名单功能。
  *  *   新增了服务端的拦截器链。
- *  *4、瞅瞅 RMI SOCKET 通讯问题 客户端发送验证信息到服务端
  *  5、考虑控制台单点发布服务，其他节点拷贝并执行
  *  6、缓存问题，ZooKeeper节点变化时候更新本地缓存，否则只拿本地缓存 
  *  7、把IP白名单的设置要放到ZooKeeper上
+ *  8 控制台对远程服务器的jar包管理，如上传JAR包后，发送指令让远程服务器刷新服务
+ *  9 控制台对远程服务器的jar文件浏览，删除
+ *  
  */
 public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
+	
+	private static RemoteAccessFactory instance = null;
+	
+	public RemoteAccessFactory(){
+		instance = this;
+	}
+	
 	static final int DEFAULT_PORT = 1232;
 	private static final long serialVersionUID = 1L;
 	private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessFactory.class) ;
@@ -81,8 +87,10 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	
 	private long startupUseTime = -1;
 	
-	
 	ServerInfo info = new ServerInfo();
+	
+	List<RmiServiceExporter> rmiServiceExporterList = new ArrayList<RmiServiceExporter>();//存放所有的服务导出对象以便释放资源
+	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
 		
@@ -133,7 +141,6 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		info.startupDate = new Date(startupDate.getTime());
 		info.startupUseTime = startupUseTime;
 	}
-
 	
 	private void initRMI() {
 		//如果没有配置host参数，那么将会使用获取的地址，
@@ -183,7 +190,6 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				}
 				
 			}
-			
 			
 //			interceptorList.add(null);//添加默认
 		}
@@ -238,7 +244,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				String xsnakeNode = "/xsnake";
 				String serviceNode = xsnakeNode +"/service";
 				String rootNode = serviceNode+ "/"+node;
-				String versionNode = rootNode + "/"+version;
+				final String versionNode = rootNode + "/"+version;
 				String maxVersionNode = rootNode + "/maxVersion";
 				String maxVersion = null;
 				connector.createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
@@ -259,7 +265,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		}
 	}
 	
-	private void exportService(RemoteServiceBean bean,RMIServerSocketFactory server,RMIClientSocketFactory client){//String name, Object obj, Object target,Remote remote,Class<?> clazz) {
+	private void exportService(RemoteServiceBean bean,RMIServerSocketFactory server,RMIClientSocketFactory client){
 		RmiServiceExporter se = new RmiServiceExporter();
 		se.setServiceName(bean.name);
 		Object obj = new XSnakeInterceptorHandler(info,interceptorList).createProxy(bean.proxy);
@@ -270,14 +276,15 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		se.setServiceInterface(bean.serviceInterface);
 		se.setClientSocketFactory(client);
 		se.setServerSocketFactory(server);
-		
 		try {
+			rmiServiceExporterList.add(se);
 			se.afterPropertiesSet();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			throw new BeanCreationException("RMI remote access bean [" + bean.target.getClass().getName() + "] creation failed !" + e.getMessage());
 		}
 	}
+	
 
 	public String getHost() {
 		return host;
@@ -334,6 +341,37 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		this.adminDatabaseConfig = adminDatabaseConfig;
 	}
 
+	public void destroy(){
+		//关闭ZooKeeper链接资源
+		if(connector!=null){
+			try {
+				connector.getZooKeeper().close();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//释放RMI服务
+		for(RmiServiceExporter rmi : rmiServiceExporterList){
+			try {
+				rmi.destroy();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//释放连接池
+		if(ConnectionPool.getInstance()!=null){
+			ConnectionPool.getInstance().destroy();
+		}
+		
+		instance = null;
+		
+	}
+
+	public static RemoteAccessFactory getInstance() {
+		return instance;
+	}
 
 	private String getLocalHost() {
 		try {
