@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.xsnake.remote.server.Remote;
 
 @Service
-@Remote
+@Remote(version=2)
 public class WechatService implements IWechatService {
 
 	@Override

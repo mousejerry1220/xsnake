@@ -12,12 +12,12 @@ public class TestServer {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
 		ApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:application-context.xml");
-		RemoteAccessFactory.getInstance().destroy();
 		try {
 			TimeUnit.SECONDS.sleep(10);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		RemoteAccessFactory.getInstance().destroy();
 		((AbstractXmlApplicationContext)ctx).refresh();
 	}
 }

@@ -27,7 +27,7 @@ public class ConnectionPool {
 		instance = null;
 	}
 	
-	public ConnectionPool(XSnakeAdminConfiguration config) throws ClassNotFoundException, SQLException {
+	public ConnectionPool(XSnakeAdminConfiguration config) throws ClassNotFoundException {
 		if(instance !=null){
 			throw new XSnakeException("连接池已经初始化过了");
 		}
@@ -39,21 +39,30 @@ public class ConnectionPool {
 		instance = this;
 	}
 	
-	private synchronized XSnakeConnection createConnection() throws SQLException{
-		Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(),config.getPassword());
-		XSnakeConnection _connection = new XSnakeConnection(connection);
-		pool.add(_connection);
-		return _connection;
+	private synchronized XSnakeConnection createConnection(){
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(config.getUrl(), config.getUsername(),config.getPassword());
+		} catch (SQLException e) {
+			throw new XSnakeException("数据库连接失败");
+		}
+		if(connection != null){
+			XSnakeConnection _connection = new XSnakeConnection(connection);
+			pool.add(_connection);
+			return _connection;
+		}
+		return null;
+		
 	}
 	
-	public synchronized Connection getConnection() throws SQLException{
+	public synchronized Connection getConnection() {
 		while(true){
 			for(XSnakeConnection connection : pool){
 				if(!connection.isLock()){
 					return connection.getConnection();
 				}
 			}
-			
+
 			if(pool.size() < config.maxSize){
 				return createConnection().getConnection();
 			}

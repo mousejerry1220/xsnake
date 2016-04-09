@@ -143,9 +143,10 @@ public class ZookeeperConnector {
 	public void createNode(String node,byte[] data,CreateMode mode) throws KeeperException, InterruptedException{
 		ZooKeeper zk = connectServer();
 		if(zk.exists(node, null)!=null){
-			zk.delete(node,-1);
+			zk.setData(node, data,-1);
+		}else{
+			zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
 		}
-		zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
 		LOG.info("创建节点数据："+node + " 内容： "+new String(data));
 	}
 	
@@ -156,7 +157,6 @@ public class ZookeeperConnector {
 			zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
 			LOG.info("创建目录："+node + (data == null ? "" : " 节点数据："+ new String(data)));
 		}
-		
 	}
 	
 	public String getStringData(String node) throws InterruptedException{

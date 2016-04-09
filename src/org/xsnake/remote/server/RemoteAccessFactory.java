@@ -8,7 +8,6 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,6 +76,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	List<XSnakeInterceptor> interceptorList = new ArrayList<XSnakeInterceptor>();
 	
 	XSnakeRMIAuthentication authentication;
+	
 	String authenticationInterface;
 	
 	XSnakeAdminConfiguration adminDatabaseConfig;
@@ -127,7 +127,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 			try {
 				//单例初始化
 				new ConnectionPool(adminDatabaseConfig);
-			} catch (ClassNotFoundException | SQLException e) {
+			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				throw new BeanCreationException(e.getMessage());
 			}
@@ -246,12 +246,14 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				String rootNode = serviceNode+ "/"+node;
 				final String versionNode = rootNode + "/"+version;
 				String maxVersionNode = rootNode + "/maxVersion";
+				String startupDate = rootNode + "/startupDate";
 				String maxVersion = null;
 				connector.createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
 				connector.createDirNode(serviceNode,null,CreateMode.PERSISTENT);
 				connector.createDirNode(rootNode,null,CreateMode.PERSISTENT);
 				connector.createDirNode(versionNode,null,CreateMode.PERSISTENT);
 				connector.createDirNode(maxVersionNode,String.valueOf(version).getBytes(),CreateMode.PERSISTENT);
+				connector.createNode(startupDate, String.valueOf(new Date().getTime()).getBytes(), CreateMode.PERSISTENT);
 				
 				maxVersion = connector.getStringData(maxVersionNode);
 				if(Integer.parseInt(maxVersion) < version){

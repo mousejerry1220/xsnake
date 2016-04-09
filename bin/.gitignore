@@ -1,3 +1,4 @@
-/xmouse/
+/application-context.xml
+/auth.properties
 /org/
-/logback.xml
+/xmouse/

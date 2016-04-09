@@ -23,7 +23,7 @@
 <!-- 	如果不配置RMI端口，则启用递增分配，递增从1232开始	 -->
 <!--    <property name="port" value="1234" /> -->
 <!-- 	验证配置 ,如果开启了验证，那么客户端必须要在classpath根目录放一个auth.properties文件，其中存放username和password的登录信息-->
-<!--    <property name="authenticationInterface" value="xmouse.TestAuth"></property> -->
+<!--    	<property name="authenticationInterface" value="xmouse.TestAuth"></property> -->
 <!-- 	客户端与服务端在同一服务器时，过滤不生效 。IP可以是正则表达式-->
 <!--    	<property name="trustAddress"> -->
 <!-- 			<array> -->
@@ -37,17 +37,17 @@
 <!-- 				<value>xmouse.TestAop2</value>  -->
 <!-- 			</array> -->
 <!-- 		</property> -->
-		<property name="adminDatabaseConfig" ref="adminDatabaseConfig" />
+<!-- 		<property name="adminDatabaseConfig" ref="adminDatabaseConfig" /> -->
    	</bean>
    	
-	<bean id="adminDatabaseConfig" class="org.xsnake.admin.dao.XSnakeAdminConfiguration">
-		<property name="maxSize" value="20" />
-		<property name="initSize" value="5" />
-		<property name="minSize" value="5" />
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://127.0.0.1:3306/joker?useUnicode=true&amp;charaterEncoding=utf-8" />
-		<property name="username" value="root" />
-		<property name="password" value="root" />
-	</bean>
+<!-- 	<bean id="adminDatabaseConfig" class="org.xsnake.admin.dao.XSnakeAdminConfiguration"> -->
+<!-- 		<property name="maxSize" value="20" /> -->
+<!-- 		<property name="initSize" value="5" /> -->
+<!-- 		<property name="minSize" value="5" /> -->
+<!-- 		<property name="driverClassName" value="com.mysql.jdbc.Driver" /> -->
+<!-- 		<property name="url" value="jdbc:mysql://127.0.0.1:3306/joker?useUnicode=true&amp;charaterEncoding=utf-8" /> -->
+<!-- 		<property name="username" value="root" /> -->
+<!-- 		<property name="password" value="root" /> -->
+<!-- 	</bean> -->
 	
 </beans>
