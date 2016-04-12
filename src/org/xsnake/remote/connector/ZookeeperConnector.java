@@ -2,6 +2,8 @@ package org.xsnake.remote.connector;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -17,6 +19,8 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooKeeper.States;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 /**
  * 如果设置timeout <= 0 那么客户端会一直阻塞直至连接到ZooKeeper为止。
@@ -157,6 +161,18 @@ public class ZookeeperConnector {
 			zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
 			LOG.info("创建目录："+node + (data == null ? "" : " 节点数据："+ new String(data)));
 		}
+	}
+	
+	public Map<String, Object> getMapData(String rootNode) throws KeeperException, InterruptedException {
+		byte[] data = zooKeeper.getData(rootNode, null, null);
+		if(data == null){
+			return new HashMap<String, Object>();
+		}
+		String interfaceInfo = new String(data);
+		Gson gson = new Gson();
+		@SuppressWarnings("unchecked")
+		Map<String,Object> interfaceInfoData = gson.fromJson(interfaceInfo, Map.class);
+		return interfaceInfoData;
 	}
 	
 	public String getStringData(String node) throws InterruptedException{

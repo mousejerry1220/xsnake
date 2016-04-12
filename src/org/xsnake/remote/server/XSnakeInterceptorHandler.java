@@ -32,7 +32,9 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 			}
 		}
 		long start = System.currentTimeMillis();
+		
 		Object result = method.invoke(targetObject, args);
+		
 		long useTime = System.currentTimeMillis() - start;
 		
 		if(interceptorList !=null){
