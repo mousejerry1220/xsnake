@@ -1,6 +1,7 @@
 package org.xsnake.remote.client;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.zookeeper.KeeperException;
@@ -13,6 +14,9 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  * 
  * @author Jerry.Zhao
  * 
+ * 
+ * 客户端需要考虑如果抛出了服务端连接异常的错误，需要去连接下一个服务器来处理，这样提高程序的高可用性
+ * 对从服务端获取的对象做代理，捕获连接异常，重新获取服务器节点调用方法
  * 客户端连接
  *
  */
@@ -55,8 +59,8 @@ public class ClientAccessFactory {
 			String xsnakeNode = "/xsnake";
 			String serviceNode = xsnakeNode +"/service";
 			String rootNode = serviceNode+"/"+node;
-			String maxVersionNode = rootNode + "/maxVersion";
-			String maxVersion = connector.getStringData(maxVersionNode);
+			Map<String, Object> interfaceInfoData = connector.getMapData(rootNode);
+			String maxVersion = String.valueOf(interfaceInfoData.get("maxVersion"));
 			String versionNode = ( version == 0 ? rootNode + "/" + maxVersion : rootNode + "/" + version);
 			List<String> list = connector.getZooKeeper().getChildren(versionNode, null);
 			if(list.size() == 0){
@@ -73,7 +77,7 @@ public class ClientAccessFactory {
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T> T getService(Class<T> interfaceService,int version){
 		String path =  getData(interfaceService.getName(),version);

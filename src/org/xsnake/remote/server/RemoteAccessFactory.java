@@ -10,7 +10,9 @@ import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.zookeeper.CreateMode;
@@ -33,6 +35,8 @@ import org.xsnake.remote.XSnakeRMIAuthentication;
 import org.xsnake.remote.XSnakeServerSocketFactory;
 import org.xsnake.remote.connector.ZookeeperConnector;
 
+import com.google.gson.Gson;
+
 /**
  * 
  * @author Jerry.Zhao
@@ -51,7 +55,7 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  *  7、把IP白名单的设置要放到ZooKeeper上
  *  8 控制台对远程服务器的jar包管理，如上传JAR包后，发送指令让远程服务器刷新服务
  *  9 控制台对远程服务器的jar文件浏览，删除
- *  
+ *  10 扫描时候配合注解，开发人员在注解里添加方法，类的注释，在控制台里可以搜索，降低维护成本
  */
 public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
 	
@@ -245,20 +249,29 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				String serviceNode = xsnakeNode +"/service";
 				String rootNode = serviceNode+ "/"+node;
 				final String versionNode = rootNode + "/"+version;
-				String maxVersionNode = rootNode + "/maxVersion";
-				String startupDate = rootNode + "/startupDate";
-				String maxVersion = null;
+				Gson gson = new Gson();
 				connector.createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
 				connector.createDirNode(serviceNode,null,CreateMode.PERSISTENT);
-				connector.createDirNode(rootNode,null,CreateMode.PERSISTENT);
-				connector.createDirNode(versionNode,null,CreateMode.PERSISTENT);
-				connector.createDirNode(maxVersionNode,String.valueOf(version).getBytes(),CreateMode.PERSISTENT);
-				connector.createNode(startupDate, String.valueOf(new Date().getTime()).getBytes(), CreateMode.PERSISTENT);
 				
-				maxVersion = connector.getStringData(maxVersionNode);
-				if(Integer.parseInt(maxVersion) < version){
-					connector.createNode(maxVersionNode, String.valueOf(version).getBytes(), CreateMode.PERSISTENT);
+				if(connector.getZooKeeper().exists(rootNode, null)==null){
+					Map<String,Object> interfaceInfo = new HashMap<String,Object>(); 
+					interfaceInfo.put("maxVersion", String.valueOf(version));
+					interfaceInfo.put("startupDate", String.valueOf(new Date().getTime()));
+					String interfaceInfoData = gson.toJson(interfaceInfo);
+					connector.getZooKeeper().create(rootNode, interfaceInfoData.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+				}else{
+					Map<String,Object> interfaceInfo = connector.getMapData(rootNode);
+					interfaceInfo.put("startupDate", String.valueOf(new Date().getTime()));
+					int v = Integer.parseInt(String.valueOf(interfaceInfo.get("maxVersion")));
+					if(v<version){
+						interfaceInfo.put("maxVersion", String.valueOf(version));
+					}
+					String interfaceInfoData = gson.toJson(interfaceInfo);
+					connector.getZooKeeper().setData(rootNode, interfaceInfoData.getBytes(),-1);
 				}
+				
+				connector.createDirNode(versionNode,null,CreateMode.PERSISTENT);
+				
 				String path = zk.create(versionNode + "/"+UUID.randomUUID().toString(), url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
 				LOG.info(String.format(" publish [%s] to [%s] >> rmi : [%s] version : [%d]",bean.serviceInterface.getName(),path,url,bean.version));
 			} catch (Exception e) {
