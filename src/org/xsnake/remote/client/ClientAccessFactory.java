@@ -15,10 +15,6 @@ import org.xsnake.remote.connector.ZookeeperConnector;
  * @author Jerry.Zhao
  * 
  * 
- * 客户端需要考虑如果抛出了服务端连接异常的错误，需要去连接下一个服务器来处理，这样提高程序的高可用性
- * 对从服务端获取的对象做代理，捕获连接异常，重新获取服务器节点调用方法
- * 客户端连接
- *
  */
 public class ClientAccessFactory {
 
@@ -88,9 +84,11 @@ public class ClientAccessFactory {
 		c.setServiceInterface(interfaceService);
 		c.setServiceUrl(path);
 		c.afterPropertiesSet();
-		return (T)c.getObject();
+		T target = (T)c.getObject();
+		T handler = (T)new XSnakeClientHandler(this,interfaceService,version).createProxy(target);
+		return handler;
 	}
-
+	
 	public String getZookeeperAddress() {
 		return zookeeperAddress;
 	}

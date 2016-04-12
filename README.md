@@ -1,5 +1,4 @@
 # xsnake
-#XSnake-1.11.jar（JDK1.7编译）  下载地址：http://pan.baidu.com/s/1slKKrmt
 #demo：
 1、在application-context.xml中配置XSnake的启动类
 ```
