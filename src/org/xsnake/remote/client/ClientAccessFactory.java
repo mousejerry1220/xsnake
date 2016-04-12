@@ -88,9 +88,11 @@ public class ClientAccessFactory {
 		c.setServiceInterface(interfaceService);
 		c.setServiceUrl(path);
 		c.afterPropertiesSet();
-		return (T)c.getObject();
+		T target = (T)c.getObject();
+		T handler = (T)new XSnakeClientHandler(this).createProxy(target,interfaceService);
+		return handler;
 	}
-
+	
 	public String getZookeeperAddress() {
 		return zookeeperAddress;
 	}
