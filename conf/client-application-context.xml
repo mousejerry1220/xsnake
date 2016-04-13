@@ -20,5 +20,6 @@
 	
 	<xsnake:client id="clientFactory" zookeeperAddress="127.0.0.1:2181"> 
 		<xsnake:service id="remoteTest" interface="xmouse.IRemoteTest" />
+		<xsnake:service id="wechatService" interface="xmouse.IWechatService" />
 	</xsnake:client>
 </beans>
