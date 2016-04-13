@@ -54,9 +54,4 @@
 <!-- 		<property name="password" value="root" /> -->
 <!-- 	</bean> -->
 
-
-<!-- 	<xsnake:client id="clientFactory" zookeeperAddress="127.0.0.1:2181">  -->
-<!-- 		<xsnake:service id="ddd" interface="aaa" /> -->
-<!-- 	</xsnake:client> -->
-
 </beans>

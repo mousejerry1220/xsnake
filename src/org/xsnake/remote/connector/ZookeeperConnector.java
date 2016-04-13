@@ -59,14 +59,19 @@ public class ZookeeperConnector {
 			}
 		});
 
-	public static ZookeeperConnector getConnector(String address,int timeout,Watcher watcher) {
+	public synchronized static ZookeeperConnector getConnector(String address,int timeout,Watcher watcher) {
 		if (connector == null) {
 			connector = new ZookeeperConnector();
 		}
 		connector.address = address;
 		connector.timeout = timeout;
 		connector.watcher = watcher;
-		connector.connectServer();
+		Thread thread = new Thread(){
+			public void run() {
+				connector.connectServer();
+			};
+		};
+		thread.start();
 		return connector;
 	}
 	
@@ -164,7 +169,8 @@ public class ZookeeperConnector {
 	}
 	
 	public Map<String, Object> getMapData(String rootNode) throws KeeperException, InterruptedException {
-		byte[] data = zooKeeper.getData(rootNode, null, null);
+		ZooKeeper zk = connectServer();
+		byte[] data = zk.getData(rootNode, null, null);
 		if(data == null){
 			return new HashMap<String, Object>();
 		}
@@ -176,8 +182,9 @@ public class ZookeeperConnector {
 	}
 	
 	public String getStringData(String node) throws InterruptedException{
+		ZooKeeper zk = connectServer();
 		try{
-			byte[] data = zooKeeper.getData(node, false, null);
+			byte[] data = zk.getData(node, false, null);
 			if(data == null){
 				return null;
 			}
