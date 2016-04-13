@@ -39,6 +39,9 @@ public class XSnakeClientHandler implements InvocationHandler {
 			Object obj = null;
 			obj = getService();
 			result = method.invoke(obj, args);
+		}catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		return result;
 	}
