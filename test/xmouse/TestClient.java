@@ -17,9 +17,9 @@ public class TestClient {
 	public static void main(String[] args) {
 		ApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:client-application-context.xml");
 		IRemoteTest remoteTest = (IRemoteTest)ctx.getBean("remoteTest");
-		IWechatService wechatService = (IWechatService)ctx.getBean("wechatService");
+//		IWechatService wechatService = (IWechatService)ctx.getBean("wechatService");
 		System.out.println(remoteTest.sayHello(" [Jerry] "));
-		wechatService.xxx();
+//		wechatService.xxx();
 	}
 	
 }
