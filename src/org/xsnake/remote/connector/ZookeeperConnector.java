@@ -3,6 +3,7 @@ package org.xsnake.remote.connector;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -149,7 +150,7 @@ public class ZookeeperConnector {
 	}
 	
 	//创建一个Node，如果存在则删除后创建，只能用于最后一级节点
-	public void createNode(String node,byte[] data,CreateMode mode) throws KeeperException, InterruptedException{
+	public void createOrUpdateNode(String node,byte[] data,CreateMode mode) throws KeeperException, InterruptedException{
 		ZooKeeper zk = connectServer();
 		if(zk.exists(node, null)!=null){
 			zk.setData(node, data,-1);
@@ -159,6 +160,12 @@ public class ZookeeperConnector {
 		LOG.info("创建节点数据："+node + " 内容： "+new String(data));
 	}
 	
+	public void udateData(String node,byte[] data) throws KeeperException, InterruptedException{
+		ZooKeeper zk = connectServer();
+		zk.setData(node, data,-1);
+	}
+	
+	
 	//如果不存在则创建，存在则不创建
 	public void createDirNode(String node,byte[] data,CreateMode mode) throws KeeperException, InterruptedException{
 		ZooKeeper zk = connectServer();
@@ -166,6 +173,11 @@ public class ZookeeperConnector {
 			zk.create(node, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
 			LOG.info("创建目录："+node + (data == null ? "" : " 节点数据："+ new String(data)));
 		}
+	}
+	
+	public boolean exists(String node) throws KeeperException, InterruptedException{
+		ZooKeeper zk = connectServer();
+		return zk.exists(node, null) != null;
 	}
 	
 	public Map<String, Object> getMapData(String rootNode) throws KeeperException, InterruptedException {
@@ -194,8 +206,20 @@ public class ZookeeperConnector {
 		}
 	}
 
-	public ZooKeeper getZooKeeper() {
-		return zooKeeper;
-	} 
+	public void close() {
+		try {
+			zooKeeper.close();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public List<String> getChildren(String path) throws KeeperException, InterruptedException {
+		return zooKeeper.getChildren(path, null);
+	}
+
+//	public ZooKeeper getZooKeeper() {
+//		return zooKeeper;
+//	} 
 	
 }

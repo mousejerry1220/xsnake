@@ -58,7 +58,7 @@ public class ClientAccessFactory {
 			Map<String, Object> interfaceInfoData = connector.getMapData(rootNode);
 			String maxVersion = String.valueOf(interfaceInfoData.get("maxVersion"));
 			String versionNode = ( version == 0 ? rootNode + "/" + maxVersion : rootNode + "/" + version);
-			List<String> list = connector.getZooKeeper().getChildren(versionNode, null);
+			List<String> list = connector.getChildren(versionNode);
 			if(list.size() == 0){
 				return null;
 			}

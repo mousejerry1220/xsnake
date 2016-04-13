@@ -14,13 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -245,7 +243,6 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				String url = String.format("rmi://%s:%d/%s", host, port, bean.name);
 				String node = bean.serviceInterface.getName();
 				int version = bean.version;
-				ZooKeeper zk = connector.getZooKeeper(); // 连接 ZooKeeper 服务器并获取 ZooKeeper 对象
 				String xsnakeNode = "/xsnake";
 				String serviceNode = xsnakeNode +"/service";
 				String rootNode = serviceNode+ "/"+node;
@@ -253,13 +250,12 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				Gson gson = new Gson();
 				connector.createDirNode(xsnakeNode,null,CreateMode.PERSISTENT);
 				connector.createDirNode(serviceNode,null,CreateMode.PERSISTENT);
-				
-				if(connector.getZooKeeper().exists(rootNode, null)==null){
+				if(!connector.exists(rootNode)){
 					Map<String,Object> interfaceInfo = new HashMap<String,Object>(); 
 					interfaceInfo.put("maxVersion", String.valueOf(version));
 					interfaceInfo.put("startupDate", String.valueOf(new Date().getTime()));
 					String interfaceInfoData = gson.toJson(interfaceInfo);
-					connector.getZooKeeper().create(rootNode, interfaceInfoData.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+					connector.createDirNode(rootNode,interfaceInfoData.getBytes(),CreateMode.PERSISTENT);
 				}else{
 					Map<String,Object> interfaceInfo = connector.getMapData(rootNode);
 					interfaceInfo.put("startupDate", String.valueOf(new Date().getTime()));
@@ -268,12 +264,11 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 						interfaceInfo.put("maxVersion", String.valueOf(version));
 					}
 					String interfaceInfoData = gson.toJson(interfaceInfo);
-					connector.getZooKeeper().setData(rootNode, interfaceInfoData.getBytes(),-1);
+					connector.udateData(rootNode,interfaceInfoData.getBytes());
 				}
-				
 				connector.createDirNode(versionNode,null,CreateMode.PERSISTENT);
-				
-				String path = zk.create(versionNode + "/"+UUID.randomUUID().toString(), url.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+				String path = versionNode + "/"+UUID.randomUUID().toString();
+				connector.createDirNode(path, url.getBytes(),CreateMode.EPHEMERAL);
 				LOG.info(String.format(" publish [%s] to [%s] >> rmi : [%s] version : [%d]",bean.serviceInterface.getName(),path,url,bean.version));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -360,11 +355,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	public void destroy(){
 		//关闭ZooKeeper链接资源
 		if(connector!=null){
-			try {
-				connector.getZooKeeper().close();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			connector.close();
 		}
 		
 		//释放RMI服务
