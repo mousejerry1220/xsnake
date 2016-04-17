@@ -7,6 +7,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.rmi.UnmarshalException;
 
+import org.springframework.remoting.RemoteConnectFailureException;
 import org.springframework.remoting.RemoteLookupFailureException;
 
 public class XSnakeClientHandler implements InvocationHandler {
@@ -37,7 +38,9 @@ public class XSnakeClientHandler implements InvocationHandler {
 		try{
 			result = method.invoke(targetObject, args);
 		}catch(InvocationTargetException e){
-			if(e.getTargetException() instanceof UnmarshalException){
+			if(e.getTargetException() instanceof UnmarshalException || //执行中断开连接时代码执行至此
+					e.getTargetException() instanceof RemoteConnectFailureException	//非执行中断开连接时代码执行至此
+					){
 				Object obj = null;
 				obj = getService();
 				result = method.invoke(obj, args);
