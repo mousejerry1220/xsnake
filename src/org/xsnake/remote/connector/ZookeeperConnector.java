@@ -80,7 +80,7 @@ public class ZookeeperConnector {
 	 * 连接服务器
 	 * @return 返回ZooKeeper
 	 */
-	private ZooKeeper connectServer() {
+	private synchronized ZooKeeper connectServer() {
 		
 		//单个计数协作器，当计数后则阻塞方法向下执行
 		CountDownLatch latch = new CountDownLatch(1);
@@ -111,7 +111,7 @@ public class ZookeeperConnector {
 		return zooKeeper;
 	}
 
-	private void createZooKeeper(final CountDownLatch latch) throws IOException {
+	private synchronized void createZooKeeper(final CountDownLatch latch) throws IOException {
 		
 		zooKeeper = new ZooKeeper(address, ZK_SESSION_TIMEOUT, new Watcher() {
 		    @Override
@@ -160,7 +160,7 @@ public class ZookeeperConnector {
 		LOG.info("创建节点数据："+node + " 内容： "+new String(data));
 	}
 	
-	public void udateData(String node,byte[] data) throws KeeperException, InterruptedException{
+	public void updateDateData(String node,byte[] data) throws KeeperException, InterruptedException{
 		ZooKeeper zk = connectServer();
 		zk.setData(node, data,-1);
 	}

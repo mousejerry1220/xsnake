@@ -18,7 +18,6 @@ import java.util.UUID;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -55,6 +54,8 @@ import com.google.gson.Gson;
  *  8 控制台对远程服务器的jar包管理，如上传JAR包后，发送指令让远程服务器刷新服务
  *  9 控制台对远程服务器的jar文件浏览，删除
  *  10 扫描时候配合注解，开发人员在注解里添加方法，类的注释，在控制台里可以搜索，降低维护成本
+ *  11 @Autowried 方式在启动的时候，如果没有任何一台主机在运行，会导致运行不起来，需要做代理对象。
+ *     因为客户端的启动也不需要依赖于服务，这个属于需要优化的地方
  */
 public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
 	
@@ -194,7 +195,6 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				
 			}
 			
-//			interceptorList.add(null);//添加默认
 		}
 	
 	}
@@ -264,7 +264,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 						interfaceInfo.put("maxVersion", String.valueOf(version));
 					}
 					String interfaceInfoData = gson.toJson(interfaceInfo);
-					connector.udateData(rootNode,interfaceInfoData.getBytes());
+					connector.updateDateData(rootNode,interfaceInfoData.getBytes());
 				}
 				connector.createDirNode(versionNode,null,CreateMode.PERSISTENT);
 				String path = versionNode + "/"+UUID.randomUUID().toString();
