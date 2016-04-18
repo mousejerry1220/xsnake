@@ -19,6 +19,7 @@
 	</context:component-scan>
 	
    	<bean id="remoteBeanFactory" class="org.xsnake.remote.server.RemoteAccessFactory" >
+<!--    	192.168.0.241:2181 -->
    		<property name="zookeeperAddress" value="127.0.0.1:2181" />
 <!--    给这个服务器起一个ID，如果这个ID为空，默认会使用 host + port 作为它的ID -->
 <!--    <property name="serverId" value="server1" />   -->

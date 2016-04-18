@@ -18,7 +18,7 @@
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
 	</context:component-scan>
 	
-	<xsnake:client id="clientFactory" zookeeperAddress="127.0.0.1:2181"> 
+	<xsnake:client id="clientFactory" zookeeperAddress="127.0.0.1:2181" timeout="0"> 
 		<xsnake:service id="remoteTest" interface="xmouse.IRemoteTest" />
 		<xsnake:service id="wechatService" interface="xmouse.IWechatService" />
 	</xsnake:client>

@@ -59,6 +59,8 @@ public class XSnakeClientHandler implements InvocationHandler {
 					//TODO 在这里记录异常，通常为服务端编程人员所为考虑到的异常
 				}
 				throw undeclaredThrowable.getUndeclaredThrowable();
+			}else {
+				throw e.getTargetException();
 			}
 		}
 		return result;

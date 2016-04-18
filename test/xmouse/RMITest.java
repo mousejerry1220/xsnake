@@ -13,7 +13,11 @@ public class RMITest {
     	c.afterPropertiesSet();
     	Object o = c.getObject();
     	System.out.println(o);
-    	((IRemoteTest)o).sayHello("Jerry111");
+    	try {
+			((IRemoteTest)o).sayHello("Jerry111");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
