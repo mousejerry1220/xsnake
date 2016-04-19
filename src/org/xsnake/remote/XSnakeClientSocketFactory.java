@@ -26,20 +26,28 @@ public class XSnakeClientSocketFactory implements RMIClientSocketFactory, Serial
 			File file = new File(path);
 			Properties prop = new Properties();
 			FileInputStream fis = new FileInputStream(file);
-			prop.load(fis); 
-			String username = prop.getProperty("username");
-			String password = prop.getProperty("password");
-			data = username + "," + password;
+			try{
+				prop.load(fis); 
+				String username = prop.getProperty("username");
+				String password = prop.getProperty("password");
+				data = username + "," + password;
+			}finally{
+				fis.close();
+			}
 		}
-		
-		int length = (data == null ? 0 : data.getBytes().length);
-		out	= socket.getOutputStream();
-		DataOutputStream write = new DataOutputStream(out);
-		write.writeInt(length);
-		if(data!=null){
-			write.writeBytes(data);
+		DataOutputStream write = null;
+		try{
+			int length = (data == null ? 0 : data.getBytes().length);
+			out	= socket.getOutputStream();
+			write= new DataOutputStream(out);
+			write.writeInt(length);
+			if(data!=null){
+				write.writeBytes(data);
+			}
+			write.flush();
+		}finally{
+			write.close();
 		}
-		write.flush();
 		return socket;
 	}
 
