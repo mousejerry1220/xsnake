@@ -1,5 +1,5 @@
 # xsnake
-
+#重要说明：上个版本可能因为错误的关闭了rmi socket 的 流通道，导致远程服务执行异常
 xsnake-1.12 下载 http://pan.baidu.com/s/1c1RGPBM
 #demo：
 1、在application-context.xml中配置XSnake的启动类
