@@ -63,7 +63,6 @@ public class TestServer {
 5、定义客户端调用方法
 在客户端的spring的context代码中增加如下配置即可使用@Autowired注解动态注入
 ```
-<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
