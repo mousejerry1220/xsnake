@@ -49,7 +49,7 @@ public class XSnakeClientHandler implements InvocationHandler {
 					throw ec ;
 				}
 				result = method.invoke(obj, args);
-				targetObject = obj;
+//				targetObject = obj;
 			}else if (e.getTargetException() instanceof InvocationTargetException){
 				throw ((InvocationTargetException)e.getTargetException()).getTargetException();
 			}else if (e.getTargetException() instanceof UndeclaredThrowableException){

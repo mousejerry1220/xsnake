@@ -1,6 +1,6 @@
 # xsnake
 
-xsnake-1.12 下载 http://pan.baidu.com/s/1mhOcIQ8
+xsnake-1.12 下载 http://pan.baidu.com/s/1c1RGPBM
 #demo：
 1、在application-context.xml中配置XSnake的启动类
 ```
