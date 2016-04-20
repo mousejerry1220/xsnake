@@ -1,4 +1,6 @@
 # xsnake
+
+xsnake-1.12 下载 http://pan.baidu.com/s/1mhOcIQ8
 #demo：
 1、在application-context.xml中配置XSnake的启动类
 ```
@@ -13,32 +15,13 @@
 	http://www.springframework.org/schema/context/spring-context-4.0.xsd
 	http://www.springframework.org/schema/mvc 
 	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd" >
-	
 	<context:component-scan base-package="xmouse" >
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
 	</context:component-scan>
 	
    	<bean id="remoteBeanFactory" class="org.xsnake.remote.server.RemoteAccessFactory" >
-   		<property name="zookeeperAddress" value="127.0.0.1:2181" />
-<!--    如果有外网地址请配置，否则可以省略 -->
-<!--    <property name="host" value="127.0.0.1" />   --> 
-<!-- 	如果不配置RMI端口，则启用递增分配，递增从1232开始	 -->
-<!--    <property name="port" value="1234" /> -->
-<!-- 	验证配置 ,如果开启了验证，那么客户端必须要在classpath根目录放一个auth.properties文件，其中存放username和password的登录信息-->
-<!--    <property name="authenticationInterface" value="xmouse.TestAuth"></property> -->
-<!-- 	客户端与服务端在同一服务器时，过滤不生效 。IP可以是正则表达式-->
-<!--    	<property name="trustAddress"> -->
-<!-- 			<array> -->
-<!-- 				<value>192.168.0.*</value>  -->
-<!-- 			</array> -->
-<!--    	</property> -->
-<!-- 	服务拦截器 -->
-<!-- 		<property name="interceptors"> -->
-<!-- 			<array> -->
-<!-- 				<value>xmouse.TestAop</value>  -->
-<!-- 				<value>xmouse.TestAop2</value>  -->
-<!-- 			</array> -->
-<!-- 		</property> -->
+   		<property name="zookeeperAddress" value="127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183" />
+   		<property name="timeout" value="15" />
    	</bean>
 	
 </beans>
@@ -46,12 +29,14 @@
 
   2、定义接口类
 ```
+  package xmouse;
   public interface IRemoteTest {
   	String sayHello(String name);
   }
 ```
   3、实现接口类
  ``` 
+  package xmouse;
   import org.springframework.stereotype.Service;
   import org.xsnake.remote.Remote;
   @Service
@@ -63,20 +48,8 @@
   	}
   }
 ```
-4、定义客户端调用方法
-```
-import org.xsnake.remote.ClientAccessFactory;
-public class TestClient {
-	public static void main(String[] args) {
-		ClientAccessFactory caf = new ClientAccessFactory("127.0.0.1:2181",10);
-		for(int i =0;i<20;i++){ //循环20次
-			IRemoteTest obj = caf.getServiceBean(IRemoteTest.class);
-			obj.sayHello("[Jerry]" );
-		}
-	}
-}
-```
-5、服务端启动程序 （本机测试我们可以启动多次，每次都可以当做一个独立的服务器）
+
+4、服务端启动程序 （本机测试我们可以启动多次，每次都可以当做一个独立的服务器）
 ```
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -86,6 +59,29 @@ public class TestServer {
 	}
 }
 ```
-6、看到20次的客户端调用分别被启动的多个服务运行。OK成功！
-      
-服务端我们只需要添加Remote标签  XSnake即可将一个普通的Service发布成RMI，通过ZooKeeper注册，将所有请求发放到集群中的各个服务端分别处理
+
+5、定义客户端调用方法
+在客户端的spring的context代码中增加如下配置即可使用@Autowired注解动态注入
+```
+	<xsnake:client id="clientFactory" zookeeperAddress="127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183" timeout="15">
+		<xsnake:service id="remoteTest" interface="xmouse.IRemoteTest" />
+	</xsnake:client>
+	
+```	
+6、或者使用以下方式
+```	
+import org.xsnake.remote.ClientAccessFactory;
+public class TestClient {
+	public static void main(String[] args) {
+		ClientAccessFactory caf = new ClientAccessFactory("127.0.0.1:2181",15);
+		IRemoteTest obj = caf.getServiceBean(IRemoteTest.class);
+		obj.sayHello("[Jerry]" );
+	}
+}
+```
+PS：      
+1、服务端我们只需要添加Remote标签，客户端可以使用配置的方式无需改动任何代码将原有系统修改成分布式系统。注意：参数与返回值需要实现序列化接口
+2、如果新项目开发，建议服务端，客户端，API分为三个不同的项目。
+
+如有疑问发送邮件：80324694@QQ.COM
+
