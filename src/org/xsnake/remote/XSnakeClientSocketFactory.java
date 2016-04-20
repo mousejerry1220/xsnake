@@ -46,7 +46,6 @@ public class XSnakeClientSocketFactory implements RMIClientSocketFactory, Serial
 			}
 			write.flush();
 		}finally{
-//			write.close();
 		}
 		return socket;
 	}
