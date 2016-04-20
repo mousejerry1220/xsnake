@@ -36,12 +36,12 @@
 <!-- 			</array> -->
 <!--    	</property> -->
 <!-- 	服务拦截器 -->
-<!-- 		<property name="interceptors"> -->
-<!-- 			<array> -->
-<!-- 				<value>xmouse.TestAop</value>  -->
-<!-- 				<value>xmouse.TestAop2</value>  -->
-<!-- 			</array> -->
-<!-- 		</property> -->
+		<property name="interceptors">
+			<array>
+				<value>org.xsnake.xmouse.TestAop</value> 
+				<value>org.xsnake.xmouse.TestAop2</value> 
+			</array>
+		</property>
 <!-- 		<property name="adminDatabaseConfig" ref="adminDatabaseConfig" /> -->
    	</bean>
    	
