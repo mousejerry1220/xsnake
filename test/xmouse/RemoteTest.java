@@ -10,8 +10,8 @@ public class RemoteTest implements IRemoteTest {
 	
 	public String sayHello(String name)  {
 		System.out.println("hello " + name);
-		throw new RuntimeException("xxxxxxx");
-//		return "hello "+ name;
+//		throw new RuntimeException("xxxxxxx");
+		return "hello "+ name;
 	}
 
 }
