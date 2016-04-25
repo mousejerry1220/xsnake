@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.xsnake.remote.XSnakeException;
 
@@ -12,7 +13,7 @@ public class ConnectionPool {
 	
 	public List<XSnakeConnection> pool = new ArrayList<XSnakeConnection>();
 	
-	private XSnakeAdminConfiguration config;
+	protected XSnakeAdminConfiguration config;
 	
 	private static ConnectionPool instance;
 	
@@ -62,12 +63,15 @@ public class ConnectionPool {
 					return connection.getConnection();
 				}
 			}
-
 			if(pool.size() < config.maxSize){
 				return createConnection().getConnection();
 			}
+			try {
+				TimeUnit.MILLISECONDS.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		
 	}
 	
 }
