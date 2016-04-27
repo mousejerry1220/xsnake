@@ -107,7 +107,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		
 	}
 
-	private void initAdminConfig() {
+	public void initAdminConfig() {
 		if(adminDatabaseConfig!=null){
 			try {
 				//单例初始化
