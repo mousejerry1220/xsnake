@@ -7,7 +7,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.xsnake.admin.dao.BaseDaoUtil;
+import org.xsnake.remote.XSnakeException;
 import org.xsnake.remote.server.InvokeInfo;
+import org.xsnake.remote.server.RemoteAccessFactory;
 import org.xsnake.remote.server.ServerInfo;
 import org.xsnake.remote.server.XSnakeAbstactInterceptor;
 
@@ -21,13 +23,17 @@ public class XSnakePlugInvokeLogsInterceptor extends XSnakeAbstactInterceptor{
 	
 	private Gson gson = new Gson();
 	
-	public static String CREATE_TABLE_LOGS_ERROR = " CREATE TABLE `logs_error` ( " +
+	public static String CREATE_TABLE_LOGS_INVOKE =" CREATE TABLE `logs_invoke` ( " +
 			" `SERVER_ID` varchar(50) DEFAULT NULL," +
 			"  `HOST` varchar(16) DEFAULT NULL," +
-			"  `port` int(11) DEFAULT NULL," +
-			"  `CREATE_DATE` date DEFAULT NULL," +
-			"  `ERROR_MESSAGE` varchar(500) DEFAULT NULL" +
-			" ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+			"  `PORT` int(11) DEFAULT NULL," +
+			"   `INTERFACE` varchar(200) DEFAULT NULL," +
+			"   `METHOD` varchar(50) DEFAULT NULL," +
+			"   `ARGS` varchar(500) DEFAULT NULL," +
+			"   `RESULT` varchar(500) DEFAULT NULL," +
+			"   `USE_TIME` int(11) DEFAULT NULL," +
+			"   `INVOKE_TIME` datetime DEFAULT NULL" +
+			"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 	
 	@Override
 	public void after(ServerInfo info, InvokeInfo invokeInfo) {
@@ -42,7 +48,12 @@ public class XSnakePlugInvokeLogsInterceptor extends XSnakeAbstactInterceptor{
 		Thread t = new Thread(){
 			public void run() {
 				try {
-					BaseDaoUtil.executeUpdate(sql, args);
+					try{
+						BaseDaoUtil.executeUpdate(sql, args);
+					}catch(XSnakeException e){
+						RemoteAccessFactory.getInstance().initAdminConfig();
+						BaseDaoUtil.executeUpdate(sql, args);
+					}
 				} catch (SQLException e) {
 					if(e.getErrorCode() == 1146){
 						try {
@@ -51,7 +62,7 @@ public class XSnakePlugInvokeLogsInterceptor extends XSnakeAbstactInterceptor{
 						} catch (SQLException e1) {
 							if(e1.getErrorCode() == 1146){
 								try {
-									BaseDaoUtil.executeUpdate(CREATE_TABLE_LOGS_ERROR,null);
+									BaseDaoUtil.executeUpdate(CREATE_TABLE_LOGS_INVOKE,null);
 									BaseDaoUtil.executeUpdate(sql, args);
 								} catch (SQLException e2) {
 								}
