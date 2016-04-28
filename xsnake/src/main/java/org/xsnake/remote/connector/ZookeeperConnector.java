@@ -104,7 +104,9 @@ public class ZookeeperConnector {
 				latch.await();
 			}
 			//否则一直等待，直到watcher收到连接成功事件唤醒	
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
+			e.printStackTrace();
+		}catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		

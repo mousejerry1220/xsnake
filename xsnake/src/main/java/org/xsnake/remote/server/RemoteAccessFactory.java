@@ -150,10 +150,17 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				}else{
 					throw new BeanCreationException("身份验证接口必须实现接口 org.xsnake.remote.XSnakeRMIAuthentication");
 				}
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+				throw new BeanCreationException(e.getMessage());
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				throw new BeanCreationException(e.getMessage());
+			}catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				throw new BeanCreationException(e.getMessage());
 			}
+			
 		}
 		
 		//如果serverId 为空，设置他的地址+端口为服务器标示
@@ -171,7 +178,13 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 					}else{
 						throw new BeanCreationException("拦截器必须实现接口 org.xsnake.remote.XSnakeInterceptor");
 					}
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+					throw new BeanCreationException(e.getMessage());
+				}catch (IllegalAccessException e) {
+					e.printStackTrace();
+					throw new BeanCreationException(e.getMessage());
+				}catch (ClassNotFoundException e) {
 					e.printStackTrace();
 					throw new BeanCreationException(e.getMessage());
 				}
