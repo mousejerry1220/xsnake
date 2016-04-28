@@ -79,6 +79,8 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
 		
+		LOG.info(" xsnake start !");
+		
 		long start = System.currentTimeMillis();
 		
 		//初始化RMI参数
@@ -195,12 +197,10 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	
 	private void findRemoteService(ApplicationContext applicationContext, String[] names) {
 		for (String name : names) {
-			System.out.println("bean name :" + name);
 			Object obj = applicationContext.getBean(name);
 			Object target = ReflectionUtil.getTarget(obj);
 			Remote remote = target.getClass().getAnnotation(Remote.class);
 			if (remote != null) {
-				System.out.println("bean name :" + name + " has Remote Annotation !");
 				if(remote.type() == Remote.Type.RMI){
 					serviceBeanList.add(RemoteServiceBean.createServiceBean(obj,target));
 				}else{
@@ -211,13 +211,13 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 			}
 		}
 		
-		System.out.println("serviceBeanList size: "+serviceBeanList.size());
 	}
 
 	private void exportService(){
 		RMIServerSocketFactory server = new XSnakeServerSocketFactory(trustAddress,authentication);
 		RMIClientSocketFactory client = new XSnakeClientSocketFactory();
 		for(RemoteServiceBean bean : serviceBeanList){
+			LOG.debug("export service : "+bean.serviceInterface.getName());
 			exportService(bean,server,client);
 		}
 	}
