@@ -13,7 +13,6 @@ import org.xsnake.remote.client.ClientAccessFactory;
 
 public class ClientServiceBeanDefinitionParser implements BeanDefinitionParser{
 
-	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {  
 		String id = element.getAttribute("id");  
         String zookeeperAddress = element.getAttribute("zookeeperAddress");
@@ -28,9 +27,6 @@ public class ClientServiceBeanDefinitionParser implements BeanDefinitionParser{
         clientBeanDefinition.getPropertyValues().add("zookeeperAddress", zookeeperAddress);
         clientBeanDefinition.getPropertyValues().add("timeout", timeout);
         parserContext.getRegistry().registerBeanDefinition(id, clientBeanDefinition);
-        
-        
-        
         
         NodeList list = element.getChildNodes();
         for(int i=0;i<list.getLength() ;i++){
@@ -67,11 +63,7 @@ public class ClientServiceBeanDefinitionParser implements BeanDefinitionParser{
         		
         	}
         }
-        
-        
         return clientBeanDefinition;  
 	}
-
-	
 	
 }

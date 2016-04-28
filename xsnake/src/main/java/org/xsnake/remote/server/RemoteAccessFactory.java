@@ -25,8 +25,6 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.remoting.rmi.RmiServiceExporter;
-import org.xsnake.admin.dao.ConnectionPool;
-import org.xsnake.admin.dao.XSnakeAdminConfiguration;
 import org.xsnake.common.ReflectionUtil;
 import org.xsnake.remote.XSnakeClientSocketFactory;
 import org.xsnake.remote.XSnakeRMIAuthentication;
@@ -36,9 +34,15 @@ import org.xsnake.remote.connector.ZookeeperConnector;
 import com.google.gson.Gson;
 
 /**
- * @author Jerry.Zhao
+ * @author Jerry.Zhao	
  */
-public class RemoteAccessFactory implements ApplicationContextAware , Serializable{
+public class RemoteAccessFactory extends XSnakeContext implements ApplicationContextAware , Serializable{
+
+	private static final long serialVersionUID = 1L;
+
+	private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessFactory.class) ;
+
+	private static final int DEFAULT_PORT = 1232;
 	
 	private static RemoteAccessFactory instance = null;
 	
@@ -46,37 +50,26 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		instance = this;
 	}
 	
-	static final int DEFAULT_PORT = 1232;
-	private static final long serialVersionUID = 1L;
-	private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessFactory.class) ;
-	private boolean alwaysCreateRegistry = true;
-	private String host;
-	private int port = 0;
-	private int timeout = 10;
-	private String zookeeperAddress;
+	//内部变量
+	
+	boolean alwaysCreateRegistry = true;
+	
 	List<RemoteServiceBean> serviceBeanList = new ArrayList<RemoteServiceBean>();
+
 	ZookeeperConnector connector;
-	private List<String> trustAddress; //信任的IP地址过滤列表
-	private List<String> interceptors;
+	
 	List<XSnakeInterceptor> interceptorList = new ArrayList<XSnakeInterceptor>();
 	
 	XSnakeRMIAuthentication authentication;
 	
-	String authenticationInterface;
+	Date startupDate = null;
 	
-	XSnakeAdminConfiguration adminDatabaseConfig;
-	
-	private String serverId;
-	
-	private Date startupDate = null;
-	
-	private long startupUseTime = -1;
+	long startupUseTime = -1;
 	
 	ServerInfo info = new ServerInfo();
 	
 	List<RmiServiceExporter> rmiServiceExporterList = new ArrayList<RmiServiceExporter>();//存放所有的服务导出对象以便释放资源
 	
-	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
 		
 		LOG.info(" xsnake start !");
@@ -97,28 +90,14 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 
 		//初始化ZooKerper连接器
 		initZooKeeper();
-
-		//初始化管理配置
-		initAdminConfig();
 		
 		startupUseTime = System.currentTimeMillis() - start;
+		
 		startupDate = new Date();
 		
 		//设置服务信息
 		initServerInfo();
 		
-	}
-
-	public void initAdminConfig() {
-		if(adminDatabaseConfig!=null){
-			try {
-				//单例初始化
-				new ConnectionPool(adminDatabaseConfig);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				throw new BeanCreationException(e.getMessage());
-			}
-		}
 	}
 
 	private void initServerInfo() {
@@ -150,10 +129,17 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				}else{
 					throw new BeanCreationException("身份验证接口必须实现接口 org.xsnake.remote.XSnakeRMIAuthentication");
 				}
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+				throw new BeanCreationException(e.getMessage());
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				throw new BeanCreationException(e.getMessage());
+			}catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				throw new BeanCreationException(e.getMessage());
 			}
+			
 		}
 		
 		//如果serverId 为空，设置他的地址+端口为服务器标示
@@ -171,7 +157,13 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 					}else{
 						throw new BeanCreationException("拦截器必须实现接口 org.xsnake.remote.XSnakeInterceptor");
 					}
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+					throw new BeanCreationException(e.getMessage());
+				}catch (IllegalAccessException e) {
+					e.printStackTrace();
+					throw new BeanCreationException(e.getMessage());
+				}catch (ClassNotFoundException e) {
 					e.printStackTrace();
 					throw new BeanCreationException(e.getMessage());
 				}
@@ -185,7 +177,6 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 	private void initZooKeeper() {
 		if(zookeeperAddress !=null){
 			connector = ZookeeperConnector.getConnector(zookeeperAddress,timeout,new Watcher() {
-				@Override
 				public void process(WatchedEvent event) {
 					if (event.getState() == Event.KeeperState.SyncConnected) {
 						publish();
@@ -280,69 +271,12 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 			throw new BeanCreationException("RMI remote access bean [" + bean.target.getClass().getName() + "] creation failed !" + e.getMessage());
 		}
 	}
-	
-
-	public String getHost() {
-		return host;
-	}
-	public void setHost(String host) {
-		this.host = host;
-	}
-	public int getPort() {
-		return port;
-	}
-	public void setPort(int port) {
-		this.port = port;
-	}
-	public int getTimeout() {
-		return timeout;
-	}
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
-	}
-	public String getZookeeperAddress() {
-		return zookeeperAddress;
-	}
-	public void setZookeeperAddress(String zookeeperAddress) {
-		this.zookeeperAddress = zookeeperAddress;
-	}
-	public List<String> getTrustAddress() {
-		return trustAddress;
-	}
-	public void setTrustAddress(List<String> trustAddress) {
-		this.trustAddress = trustAddress;
-	}
-	public List<String> getInterceptors() {
-		return interceptors;
-	}
-	public void setInterceptors(List<String> interceptors) {
-		this.interceptors = interceptors;
-	}
-	public String getAuthenticationInterface() {
-		return authenticationInterface;
-	}
-	public void setAuthenticationInterface(String authenticationInterface) {
-		this.authenticationInterface = authenticationInterface;
-	}
-	public String getServerId() {
-		return serverId;
-	}
-	public void setServerId(String serverId) {
-		this.serverId = serverId;
-	}
-	public XSnakeAdminConfiguration getAdminDatabaseConfig() {
-		return adminDatabaseConfig;
-	}
-	public void setAdminDatabaseConfig(XSnakeAdminConfiguration adminDatabaseConfig) {
-		this.adminDatabaseConfig = adminDatabaseConfig;
-	}
 
 	public void destroy(){
 		//关闭ZooKeeper链接资源
 		if(connector!=null){
 			connector.close();
 		}
-		
 		//释放RMI服务
 		for(RmiServiceExporter rmi : rmiServiceExporterList){
 			try {
@@ -351,21 +285,14 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 				e.printStackTrace();
 			}
 		}
-		
-		//释放连接池
-		if(ConnectionPool.getInstance()!=null){
-			ConnectionPool.getInstance().destroy();
-		}
-		
 		instance = null;
-		
 	}
 
 	public static RemoteAccessFactory getInstance() {
 		return instance;
 	}
 
-	private String getLocalHost() {
+	protected String getLocalHost() {
 		try {
 			return InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
@@ -375,7 +302,7 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		
 	}
 	
-	public int getPort(int port) {
+	protected int getPort(int port) {
 		ServerSocket ss = null;
 		try{
 			 ss = new ServerSocket(port);
@@ -393,6 +320,4 @@ public class RemoteAccessFactory implements ApplicationContextAware , Serializab
 		}
 		return port;
 	}
-
-	
 }

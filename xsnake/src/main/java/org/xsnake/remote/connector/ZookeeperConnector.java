@@ -47,7 +47,6 @@ public class ZookeeperConnector {
 	
 	private FutureTask<Boolean> ft = new FutureTask<Boolean>(
 		new Callable<Boolean>() {
-			@Override
 			public Boolean call() throws Exception {
 				long _timeout = System.currentTimeMillis() + (timeout * 1000) ; 
 				while (_timeout > System.currentTimeMillis()) {
@@ -104,7 +103,9 @@ public class ZookeeperConnector {
 				latch.await();
 			}
 			//否则一直等待，直到watcher收到连接成功事件唤醒	
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
+			e.printStackTrace();
+		}catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
@@ -114,7 +115,6 @@ public class ZookeeperConnector {
 	private synchronized void createZooKeeper(final CountDownLatch latch) throws IOException {
 		
 		zooKeeper = new ZooKeeper(address, ZK_SESSION_TIMEOUT, new Watcher() {
-		    @Override
 		    public void process(WatchedEvent event) {
 		        if (event.getState() == Event.KeeperState.SyncConnected) {
 		            latch.countDown();

@@ -65,11 +65,13 @@ public class ClientAccessFactory {
 			String path = list.get(RandomUtils.nextInt(list.size()));
 			String data = connector.getStringData(versionNode+"/"+path);
 			return data;
-		} catch (KeeperException | InterruptedException e) {
+		} catch (KeeperException e) {
 			e.printStackTrace();
 			if( e instanceof KeeperException){
 				throw new XSnakeException(" XSnake Client Error ! ");
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}

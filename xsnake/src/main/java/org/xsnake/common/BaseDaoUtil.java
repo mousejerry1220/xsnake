@@ -1,4 +1,4 @@
-package org.xsnake.admin.dao;
+package org.xsnake.common;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,31 +9,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.xsnake.remote.XSnakeException;
+import org.xsnake.remote.server.RemoteAccessFactory;
 
 public class BaseDaoUtil {
 	
-	public static String getDatabase(){
-		String driver = ConnectionPool.getInstance().config.getDriverClassName();
-		driver = driver.toLowerCase();
-		if(driver.indexOf("mysql")>-1){
-			return "mysql";
-		}else if(driver.indexOf("oracle") > -1 ){
-			return "oracle";
-		}
-		return null;
+	public static Connection getConnection() throws SQLException{
+		return RemoteAccessFactory.getInstance().getDataSource().getConnection();
 	}
 	
 	public static int executeUpdate(String sql,Object[] args) throws SQLException{
-		if (ConnectionPool.getInstance() == null) {
-			throw new XSnakeException("连接池未初始化");
-		}
 		Connection connection = null;
 		PreparedStatement statement = null;
 		int result = 0;
 		try {
-			connection = ConnectionPool.getInstance().getConnection();
+			connection = getConnection();
 			statement = connection.prepareStatement(sql);
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
@@ -53,15 +42,12 @@ public class BaseDaoUtil {
 	}
 	
 	public static List<Map<String, Object>> query(String sql, Object[] args) throws SQLException {
-		if (ConnectionPool.getInstance() == null) {
-			throw new XSnakeException("连接池未初始化");
-		}
 		Connection connection = null;
 		PreparedStatement statement = null;
 		ResultSet rs = null;
 		List<Map<String, Object>> list = null;
 		try {
-			connection = ConnectionPool.getInstance().getConnection();
+			connection = getConnection();
 			statement = connection.prepareStatement(sql);
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {

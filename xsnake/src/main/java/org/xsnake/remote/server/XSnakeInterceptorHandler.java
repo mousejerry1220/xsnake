@@ -24,7 +24,6 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 				targetObject.getClass().getInterfaces(), this);
 	}
 
-	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)throws Throwable {
 		if(interceptorList !=null){
 			for(XSnakeInterceptor interceptor : interceptorList){

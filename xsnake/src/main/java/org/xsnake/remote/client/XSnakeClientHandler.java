@@ -34,7 +34,6 @@ public class XSnakeClientHandler implements InvocationHandler {
 				new Class[]{interfaceService}, this);
 	}
 
-	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)throws Throwable {
 		Object result = null;
 		try{
@@ -45,8 +44,7 @@ public class XSnakeClientHandler implements InvocationHandler {
 				throw new XSnakeException("身份验证失败");
 			}
 			if(e.getTargetException() instanceof UnmarshalException || //执行中断开连接时代码执行至此
-					(e.getTargetException() instanceof RemoteConnectFailureException )	//非执行中断开连接时代码执行至此
-					){
+					(e.getTargetException() instanceof RemoteConnectFailureException )){	//非执行中断开连接时代码执行至此
 				Object obj = null;
 				try{
 					obj = getService();

@@ -10,7 +10,7 @@ public class TestClient {
 //		ClientAccessFactory caf = new ClientAccessFactory("192.168.0.241:2181",10);
 //		for(int i =0;i<20;i++){
 //			IRemoteTest obj = caf.getService(IRemoteTest.class);
-//			System.out.println(obj.sayHello("[Jerry]" + "    "));
+//			System.out.println(obj.sayHello(" xsnake " + "    "));
 //		}
 //	}
 	
@@ -19,7 +19,7 @@ public class TestClient {
 		ApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:client-application-context.xml");
 		IRemoteTest remoteTest = (IRemoteTest)ctx.getBean("remoteTest");
 		try {
-			remoteTest.sayHello(" [Jerry] "); 
+			remoteTest.sayHello(" xsnake "); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

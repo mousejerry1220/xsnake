@@ -1,4 +1,4 @@
-package org.xsnake.admin;
+package org.xsnake.plug;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -6,16 +6,19 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.xsnake.admin.dao.BaseDaoUtil;
-import org.xsnake.remote.XSnakeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xsnake.common.BaseDaoUtil;
 import org.xsnake.remote.server.InvokeInfo;
-import org.xsnake.remote.server.RemoteAccessFactory;
 import org.xsnake.remote.server.ServerInfo;
 import org.xsnake.remote.server.XSnakeAbstactInterceptor;
 
 import com.google.gson.Gson;
 
-public class XSnakePlugInvokeLogsInterceptor extends XSnakeAbstactInterceptor{
+//for mysql
+public class InvokeLogsInterceptor extends XSnakeAbstactInterceptor{
+	
+	private final static Logger LOG = LoggerFactory.getLogger(InvokeLogsInterceptor.class) ;
 	
 	private ExecutorService service =  Executors.newFixedThreadPool(10);
 	
@@ -48,12 +51,7 @@ public class XSnakePlugInvokeLogsInterceptor extends XSnakeAbstactInterceptor{
 		Thread t = new Thread(){
 			public void run() {
 				try {
-					try{
-						BaseDaoUtil.executeUpdate(sql, args);
-					}catch(XSnakeException e){
-						RemoteAccessFactory.getInstance().initAdminConfig();
-						BaseDaoUtil.executeUpdate(sql, args);
-					}
+					BaseDaoUtil.executeUpdate(sql, args);
 				} catch (SQLException e) {
 					if(e.getErrorCode() == 1146){
 						try {
@@ -68,6 +66,8 @@ public class XSnakePlugInvokeLogsInterceptor extends XSnakeAbstactInterceptor{
 								}
 							}
 						}
+					}else{
+						LOG.warn(e.getMessage());
 					}
 				}
 			};

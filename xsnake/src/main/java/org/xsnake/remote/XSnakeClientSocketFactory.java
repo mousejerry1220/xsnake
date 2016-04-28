@@ -15,7 +15,6 @@ public class XSnakeClientSocketFactory implements RMIClientSocketFactory, Serial
 
 	private static final long serialVersionUID = 1L;
 
-	@Override
 	public Socket createSocket(String host, int port) throws IOException {
 		Socket socket = new XSnakeClientSocket(host, port);
 		OutputStream out = null;
