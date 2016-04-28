@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.rmi.server.RMIServerSocketFactory;
 import java.util.List;
+import org.xsnake.remote.XSnakeServerSocket;
 
 public class XSnakeServerSocketFactory implements RMIServerSocketFactory , Serializable{
 
