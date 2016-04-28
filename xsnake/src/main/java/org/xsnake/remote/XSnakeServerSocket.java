@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
  
-public class XSnakeServerSocketX extends ServerSocket { 
+public class XSnakeServerSocket extends ServerSocket { 
 
 	List<String> trustAddress = new ArrayList<String>();
 	boolean trust = false;
 	
 	XSnakeRMIAuthentication authentication;
 	
-    public XSnakeServerSocketX(int port,List<String> trustAddress,XSnakeRMIAuthentication authentication) throws IOException {
+    public XSnakeServerSocket(int port,List<String> trustAddress,XSnakeRMIAuthentication authentication) throws IOException {
         super(port);
         if(trustAddress!=null){
         	this.trustAddress.addAll(trustAddress);

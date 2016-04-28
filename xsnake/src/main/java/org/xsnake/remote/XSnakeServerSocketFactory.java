@@ -19,7 +19,7 @@ public class XSnakeServerSocketFactory implements RMIServerSocketFactory , Seria
 	}
 	
 	public ServerSocket createServerSocket(int port) throws IOException {
-		ServerSocket serverSocket = new XSnakeServerSocketX(port,trustAddress,authentication);
+		ServerSocket serverSocket = new XSnakeServerSocket(port,trustAddress,authentication);
 		return serverSocket;
 	}
 
