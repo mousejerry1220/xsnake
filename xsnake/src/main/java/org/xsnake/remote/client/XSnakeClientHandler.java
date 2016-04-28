@@ -10,6 +10,7 @@ import java.rmi.UnmarshalException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.springframework.remoting.RemoteLookupFailureException;
+import org.xsnake.remote.XSnakeException;
 
 public class XSnakeClientHandler implements InvocationHandler {
 	
@@ -39,8 +40,12 @@ public class XSnakeClientHandler implements InvocationHandler {
 		try{
 			result = method.invoke(targetObject, args);
 		}catch(InvocationTargetException e){
+			if(e.getTargetException() instanceof RemoteConnectFailureException && 
+					e.getTargetException().getCause() instanceof java.rmi.ConnectIOException){
+				throw new XSnakeException("身份验证失败");
+			}
 			if(e.getTargetException() instanceof UnmarshalException || //执行中断开连接时代码执行至此
-					e.getTargetException() instanceof RemoteConnectFailureException	//非执行中断开连接时代码执行至此
+					(e.getTargetException() instanceof RemoteConnectFailureException )	//非执行中断开连接时代码执行至此
 					){
 				Object obj = null;
 				try{

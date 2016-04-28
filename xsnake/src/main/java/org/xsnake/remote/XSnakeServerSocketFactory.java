@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.rmi.server.RMIServerSocketFactory;
 import java.util.List;
-import org.xsnake.remote.XSnakeServerSocket;
 
 public class XSnakeServerSocketFactory implements RMIServerSocketFactory , Serializable{
 
@@ -20,7 +19,7 @@ public class XSnakeServerSocketFactory implements RMIServerSocketFactory , Seria
 	}
 	
 	public ServerSocket createServerSocket(int port) throws IOException {
-		ServerSocket serverSocket = new XSnakeServerSocket(port,trustAddress,authentication);
+		ServerSocket serverSocket = new XSnakeServerSocketX(port,trustAddress,authentication);
 		return serverSocket;
 	}
 
