@@ -19,7 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.xsnake.common.ReflectionUtil;
 import org.xsnake.logs.XSnakeLogsInterface;
-import org.xsnake.logs.mysql.XSnakeLogsImpl;
+import org.xsnake.logs.mysql.MysqlLogsImpl;
 import org.xsnake.remote.XSnakeRMIAuthentication;
 import org.xsnake.remote.connector.ZookeeperConnector;
 
@@ -74,7 +74,7 @@ public abstract class XSnakeContext implements ApplicationContextAware , Seriali
 	
 	XSnakeRMIAuthentication authentication;
 	
-	XSnakeLogsInterface logger = new XSnakeLogsImpl();
+	XSnakeLogsInterface logger = new MysqlLogsImpl();
 	
 	public final void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
 	
@@ -97,7 +97,7 @@ public abstract class XSnakeContext implements ApplicationContextAware , Seriali
 		//设置服务信息
 		initServerInfo();
 		
-		logger.log4ServerStartup(info);
+		logger.log4ServerStartup();
 	}
 
 	private void initConfig() {

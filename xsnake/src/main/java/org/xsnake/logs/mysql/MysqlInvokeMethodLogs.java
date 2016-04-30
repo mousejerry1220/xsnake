@@ -1,33 +1,23 @@
 package org.xsnake.logs.mysql;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.xsnake.common.SingletonUtil;
 import org.xsnake.remote.server.InvokeInfo;
 import org.xsnake.remote.server.ServerInfo;
+import org.xsnake.remote.server.XSnakeContext;
 
-import com.google.gson.Gson;
-
-public class InvokeMethodLogs extends DatabaseLogs{
-	
-	private Gson gson = new Gson();
-	
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-	
-	ServerInfo info;
+public class MysqlInvokeMethodLogs extends MysqlDatabaseLogs{
 	
 	InvokeInfo invokeInfo;
 	
-	public InvokeMethodLogs(ServerInfo info, InvokeInfo invokeInfo) {
-		
-		this.info = info;
-		
+	public MysqlInvokeMethodLogs( InvokeInfo invokeInfo) {
 		this.invokeInfo = invokeInfo;
 	}
 
 	@Override
 	String getCreateTableSQL() {
-		return " CREATE TABLE `logs_invoke` ( " +
+		return " CREATE TABLE `"+getTemplateTableName()+"` ( " +
 				" `SERVER_ID` varchar(50) DEFAULT NULL," +
 				"  `HOST` varchar(16) DEFAULT NULL," +
 				"  `PORT` int(11) DEFAULT NULL," +
@@ -50,22 +40,23 @@ public class InvokeMethodLogs extends DatabaseLogs{
 
 	@Override
 	Object[] getArgs() {
+		ServerInfo info = XSnakeContext.getServerInfo();
 		Object[] args = new Object[]{info.getServerId(),info.getHost(),info.getPort(),
-				invokeInfo.getTarget().getClass().getName(),invokeInfo.getMethod().getName(),gson.toJson(invokeInfo.getArgs()),
-				gson.toJson(invokeInfo.getResult()),invokeInfo.getUseTime(),new Date()};
+				invokeInfo.getTarget().getClass().getName(),invokeInfo.getMethod().getName(),SingletonUtil.getGson().toJson(invokeInfo.getArgs()),
+				SingletonUtil.getGson().toJson(invokeInfo.getResult()),invokeInfo.getUseTime(),new Date()};
 		return args;
 	}
 
 	@Override
 	String getCurrentTableName() {
-		String date = sdf.format(new Date());
-		String table = date + "_logs_invoke";
+		String date = SingletonUtil.getSimpleDateFormat().format(new Date());
+		String table = getTemplateTableName()  + "_"+ date;
 		return table;
 	}
 
 	@Override
 	String getTemplateTableName() {
-		return "logs_invoke";
+		return "xsnake_logs_invoke";
 	}
 
 }

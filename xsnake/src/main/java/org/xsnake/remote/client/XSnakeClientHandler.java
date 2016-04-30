@@ -60,7 +60,7 @@ public class XSnakeClientHandler implements InvocationHandler {
 				if(undeclaredThrowable.getUndeclaredThrowable() instanceof InvocationTargetException){
 					Throwable throwable = ((InvocationTargetException)undeclaredThrowable.getUndeclaredThrowable()).getTargetException();
 					if(XSnakeContext.getLogger()!=null){
-						XSnakeContext.getLogger().log4XSnakeException(XSnakeContext.getServerInfo(),throwable);
+						XSnakeContext.getLogger().log4XSnakeException(throwable);
 					}
 					throw throwable;
 				}

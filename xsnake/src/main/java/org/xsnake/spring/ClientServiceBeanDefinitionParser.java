@@ -1,4 +1,4 @@
-package org.xsnake.remote.client;
+package org.xsnake.spring;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xsnake.remote.client.ClientAccessFactory;
 
 public class ClientServiceBeanDefinitionParser implements BeanDefinitionParser{
 

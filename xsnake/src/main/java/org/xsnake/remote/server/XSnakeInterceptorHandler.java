@@ -35,7 +35,7 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 				}
 			}
 			if(XSnakeContext.getLogger() !=null){
-				XSnakeContext.getLogger().log4InvokeMethod(XSnakeContext.getServerInfo(), invokeInfo);
+				XSnakeContext.getLogger().log4InvokeMethod(invokeInfo);
 			}
 		}else{
 			result = method.invoke(targetObject, args);

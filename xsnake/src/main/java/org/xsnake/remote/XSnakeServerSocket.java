@@ -38,7 +38,7 @@ public class XSnakeServerSocket extends ServerSocket {
         	for(String address :trustAddress){
                 boolean pass = Pattern.compile("^"+address).matcher(socketAddress).find();
                 if(!pass){
-                	XSnakeContext.getLogger().log4NotTrustAddress(XSnakeContext.getServerInfo(),s);
+                	XSnakeContext.getLogger().log4NotTrustAddress(s);
         			s.close();
         		}
         	}
@@ -66,7 +66,7 @@ public class XSnakeServerSocket extends ServerSocket {
         //如果需要验证，并且验证失败
     	//TODO 记录错误的IP
         if(authentication!=null && (!auth(username,password)) ){
-        	XSnakeContext.getLogger().log4AuthenticationFailed(XSnakeContext.getServerInfo(),s);
+        	XSnakeContext.getLogger().log4AuthenticationFailed(s);
         	s.close();
         }
         return s;

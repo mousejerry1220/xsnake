@@ -6,9 +6,9 @@ import java.util.concurrent.Executors;
 
 import org.xsnake.common.BaseDaoUtil;
 
-public abstract class DatabaseLogs {
+public abstract class MysqlDatabaseLogs {
 
-	private ExecutorService service =  Executors.newFixedThreadPool(2);
+	private static ExecutorService service =  Executors.newFixedThreadPool(10);
 	
 	abstract String getCreateTableSQL();
 	
@@ -28,7 +28,9 @@ public abstract class DatabaseLogs {
 				} catch (SQLException e) {
 					if(e.getErrorCode() == 1146){
 						try {
-							BaseDaoUtil.executeUpdate("CREATE TABLE "+getCurrentTableName()+" SELECT * FROM "+getTemplateTableName()+" WHERE 1=0 ",null);
+							if(!getTemplateTableName().equals(getCurrentTableName())){
+								BaseDaoUtil.executeUpdate("CREATE TABLE "+getCurrentTableName()+" SELECT * FROM "+getTemplateTableName()+" WHERE 1=0 ",null);
+							}
 							BaseDaoUtil.executeUpdate(getInsertSQL(), getArgs());
 						} catch (SQLException e1) {
 							if(e1.getErrorCode() == 1146){
