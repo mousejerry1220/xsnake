@@ -16,29 +16,24 @@ public class XSnakeInterceptorHandler implements InvocationHandler {
 
 	public Object invoke(Object proxy, Method method, Object[] args)throws Throwable {
 		
-		boolean toStringMethod = "toString".equals(method.getName());
 		Object result = null;
-		if(!toStringMethod){
-			List<XSnakeInterceptor> interceptorList = XSnakeContext.getInterceptorList();
-			if(interceptorList !=null){
-				for(XSnakeInterceptor interceptor : interceptorList){
-					interceptor.before(XSnakeContext.getServerInfo(),new InvokeInfo (targetObject, method, args,null,-1));
-				}
+		List<XSnakeInterceptor> interceptorList = XSnakeContext.getInterceptorList();
+		if(interceptorList !=null){
+			for(XSnakeInterceptor interceptor : interceptorList){
+				interceptor.before(XSnakeContext.getServerInfo(),new InvokeInfo (targetObject, method, args,null,-1));
 			}
-			long start = System.currentTimeMillis();
-			result = method.invoke(targetObject, args);
-			long useTime = System.currentTimeMillis() - start;
-			InvokeInfo invokeInfo = new InvokeInfo(targetObject, method, args,result,useTime);
-			if(interceptorList !=null){
-				for(XSnakeInterceptor interceptor : interceptorList){
-					interceptor.after(XSnakeContext.getServerInfo(),invokeInfo);
-				}
+		}
+		long start = System.currentTimeMillis();
+		result = method.invoke(targetObject, args);
+		long useTime = System.currentTimeMillis() - start;
+		InvokeInfo invokeInfo = new InvokeInfo(targetObject, method, args,result,useTime);
+		if(interceptorList !=null){
+			for(XSnakeInterceptor interceptor : interceptorList){
+				interceptor.after(XSnakeContext.getServerInfo(),invokeInfo);
 			}
-			if(XSnakeContext.getLogger() !=null){
-				XSnakeContext.getLogger().log4InvokeMethod(invokeInfo);
-			}
-		}else{
-			result = method.invoke(targetObject, args);
+		}
+		if(XSnakeContext.getLogger() !=null){
+			XSnakeContext.getLogger().log4InvokeMethod(invokeInfo);
 		}
 		return result;
 	}
