@@ -1,10 +1,13 @@
-package org.xsnake.logs;
+package org.xsnake.logs.mysql;
 
 import java.net.Socket;
 
+import org.xsnake.logs.XSnakeLogsInterface;
 import org.xsnake.remote.server.InvokeInfo;
 import org.xsnake.remote.server.ServerInfo;
 
+
+//默认日志，mysql实现
 public class XSnakeLogsImpl implements XSnakeLogsInterface{
 
 	public void log4InvokeMethod(ServerInfo info, InvokeInfo invokeInfo) {

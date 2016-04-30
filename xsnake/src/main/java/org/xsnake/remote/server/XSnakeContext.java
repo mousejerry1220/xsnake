@@ -18,8 +18,8 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.xsnake.common.ReflectionUtil;
-import org.xsnake.logs.XSnakeLogsImpl;
 import org.xsnake.logs.XSnakeLogsInterface;
+import org.xsnake.logs.mysql.XSnakeLogsImpl;
 import org.xsnake.remote.XSnakeRMIAuthentication;
 import org.xsnake.remote.connector.ZookeeperConnector;
 

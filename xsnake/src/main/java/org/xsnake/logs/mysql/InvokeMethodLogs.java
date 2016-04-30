@@ -1,4 +1,4 @@
-package org.xsnake.logs;
+package org.xsnake.logs.mysql;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package org.xsnake.logs;
+package org.xsnake.logs.mysql;
 
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
