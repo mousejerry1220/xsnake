@@ -10,7 +10,7 @@ import java.rmi.UnmarshalException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.springframework.remoting.RemoteLookupFailureException;
-import org.xsnake.remote.XSnakeException;
+import org.xsnake.remote.server.XSnakeContext;
 
 public class XSnakeClientHandler implements InvocationHandler {
 	
@@ -41,7 +41,7 @@ public class XSnakeClientHandler implements InvocationHandler {
 		}catch(InvocationTargetException e){
 			if(e.getTargetException() instanceof RemoteConnectFailureException && 
 					e.getTargetException().getCause() instanceof java.rmi.ConnectIOException){
-				throw new XSnakeException("身份验证失败");
+				throw new Exception("身份验证失败");
 			}
 			if(e.getTargetException() instanceof UnmarshalException || //执行中断开连接时代码执行至此
 					(e.getTargetException() instanceof RemoteConnectFailureException )){	//非执行中断开连接时代码执行至此
@@ -58,8 +58,11 @@ public class XSnakeClientHandler implements InvocationHandler {
 			}else if (e.getTargetException() instanceof UndeclaredThrowableException){
 				UndeclaredThrowableException undeclaredThrowable = (UndeclaredThrowableException)e.getTargetException();
 				if(undeclaredThrowable.getUndeclaredThrowable() instanceof InvocationTargetException){
-					throw ((InvocationTargetException)undeclaredThrowable.getUndeclaredThrowable()).getTargetException();
-					//TODO 在这里记录异常，通常为服务端编程人员所为考虑到的异常
+					Throwable throwable = ((InvocationTargetException)undeclaredThrowable.getUndeclaredThrowable()).getTargetException();
+					if(XSnakeContext.getLogger()!=null){
+						XSnakeContext.getLogger().log4XSnakeException(XSnakeContext.getServerInfo(),throwable);
+					}
+					throw throwable;
 				}
 				throw undeclaredThrowable.getUndeclaredThrowable();
 			}else {

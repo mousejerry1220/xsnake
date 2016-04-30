@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.xsnake</groupId>
 	<artifactId>xsnake</artifactId>
-	<version>1.20-SNAPSHOT</version>
+	<version>1.21</version>
 	<name>xsnake</name>
 	<url>https://github.com/mousejerry1220/xsnake</url>
 	<description>xsnake</description>
@@ -36,10 +35,11 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git@github.com:mousejerry1220/xsnake.git</connection>
-		<developerConnection>scm:git@github.com:mousejerry1220/xsnake.git</developerConnection>
+		<connection>scm:git:git@github.com:mousejerry1220/xsnake.git</connection>
+		<developerConnection>scm:git:git@github.com:mousejerry1220/xsnake.git</developerConnection>
 		<url>git@github.com:mousejerry1220/xsnake.git</url>
-	</scm>
+    	<tag>xsnake-1.21</tag>
+  	</scm>
 
 	<build>
 		<plugins>
@@ -48,8 +48,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.5</source>
+					<target>1.5</target>
 				</configuration>
 			</plugin>
 		</plugins>

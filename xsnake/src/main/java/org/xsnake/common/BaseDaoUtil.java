@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.xsnake.remote.server.RemoteAccessFactory;
+
+import org.xsnake.remote.server.XSnakeContext;
 
 public class BaseDaoUtil {
 	
 	public static Connection getConnection() throws SQLException{
-		return RemoteAccessFactory.getInstance().getDataSource().getConnection();
+		return XSnakeContext.getConnection();
 	}
 	
 	public static int executeUpdate(String sql,Object[] args) throws SQLException{
@@ -23,6 +24,9 @@ public class BaseDaoUtil {
 		int result = 0;
 		try {
 			connection = getConnection();
+			if(connection == null){
+				return -1;
+			}
 			statement = connection.prepareStatement(sql);
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
@@ -48,6 +52,9 @@ public class BaseDaoUtil {
 		List<Map<String, Object>> list = null;
 		try {
 			connection = getConnection();
+			if(connection == null){
+				return new ArrayList<Map<String,Object>>();
+			}
 			statement = connection.prepareStatement(sql);
 			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
