@@ -31,6 +31,4 @@ public @interface Remote {
 	Class<?> serviceInterface() default Void.class;
 	
 	int version() default 1; 
-	
-	Type type() default Type.RMI;
 }

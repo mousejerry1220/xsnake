@@ -33,21 +33,16 @@ public class ClientAccessFactory {
 		this.zookeeperAddress = zookeeperAddress;
 	}
 
-	/**
-	 * 获得远程的服务对象，通过指定接口类型，获取远程最高版本的实现对象
-	 * @param interfaceService 接口类型
-	 * @return
-	 */
+	//获得远程的服务对象，通过指定接口类型，获取远程最高版本的实现对象
 	public <T> T getService(Class<T> interfaceService){
 		return getService(interfaceService,0);
 	}
 	
-	/**
+	/*
 	 * 获得远程的服务对象，通过指定接口类型，
 	 * 获取该接口类型的远程代码实现，如果版本号=0，则默认获取远程最高版本的实现对象
 	 * @param interfaceService 接口类型
 	 * @param version 指定版本号
-	 * @return
 	 */
 	public String getData(String node,int version) {
 		ZookeeperConnector connector = ZookeeperConnector.getConnector(zookeeperAddress,timeout,null);
@@ -66,12 +61,8 @@ public class ClientAccessFactory {
 			String data = connector.getStringData(versionNode+"/"+path);
 			return data;
 		} catch (KeeperException e) {
-			e.printStackTrace();
-			if( e instanceof KeeperException){
-				throw new XSnakeException(" XSnake Client Error ! ");
-			}
+			throw new XSnakeException(" XSnake Client Error ! ");
 		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		return null;
 	}

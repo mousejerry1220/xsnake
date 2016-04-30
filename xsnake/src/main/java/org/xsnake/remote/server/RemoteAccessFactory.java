@@ -16,99 +16,33 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.remoting.rmi.RmiServiceExporter;
-import org.xsnake.common.ReflectionUtil;
 import org.xsnake.remote.XSnakeClientSocketFactory;
-import org.xsnake.remote.XSnakeRMIAuthentication;
 import org.xsnake.remote.XSnakeServerSocketFactory;
-import org.xsnake.remote.connector.ZookeeperConnector;
 
 import com.google.gson.Gson;
 
 /**
+ * RMI实现
  * @author Jerry.Zhao	
  */
-public class RemoteAccessFactory extends XSnakeContext implements ApplicationContextAware , Serializable{
+public class RemoteAccessFactory extends XSnakeContext implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 
 	private final static Logger LOG = LoggerFactory.getLogger(RemoteAccessFactory.class) ;
 
 	private static final int DEFAULT_PORT = 1232;
-	
-	private static RemoteAccessFactory instance = null;
-	
-	public RemoteAccessFactory(){
-		instance = this;
-	}
-	
+
 	//内部变量
-	
 	boolean alwaysCreateRegistry = true;
 	
-	List<RemoteServiceBean> serviceBeanList = new ArrayList<RemoteServiceBean>();
-
-	ZookeeperConnector connector;
-	
-	List<XSnakeInterceptor> interceptorList = new ArrayList<XSnakeInterceptor>();
-	
-	XSnakeRMIAuthentication authentication;
-	
-	Date startupDate = null;
-	
-	long startupUseTime = -1;
-	
-	ServerInfo info = new ServerInfo();
-	
 	List<RmiServiceExporter> rmiServiceExporterList = new ArrayList<RmiServiceExporter>();//存放所有的服务导出对象以便释放资源
-	
-	public void setApplicationContext(ApplicationContext applicationContext)throws BeansException {
-		
-		LOG.info(" xsnake start !");
-		
-		long start = System.currentTimeMillis();
-		
-		//初始化RMI参数
-		initRMI();
-		
-		//获取到spring管理的所有bean
-		String[] names = applicationContext.getBeanDefinitionNames();
 
-		//循环所有的bean 找到符合要求的bean
-		findRemoteService(applicationContext, names);
-		
-		//导出服务
-		exportService();
-
-		//初始化ZooKerper连接器
-		initZooKeeper();
-		
-		startupUseTime = System.currentTimeMillis() - start;
-		
-		startupDate = new Date();
-		
-		//设置服务信息
-		initServerInfo();
-		
-	}
-
-	private void initServerInfo() {
-		info.serverId = serverId;
-		info.host = host;
-		info.port = port;
-		info.startupDate = new Date(startupDate.getTime());
-		info.startupUseTime = startupUseTime;
-	}
-	
-	private void initRMI() {
+	protected void initServiceContext() {
 		//如果没有配置host参数，那么将会使用获取的地址，
 		//一般为内网IP地址，所以不配置此项会导致服务在外网无法访问。
 		if(host ==null){
@@ -120,100 +54,22 @@ public class RemoteAccessFactory extends XSnakeContext implements ApplicationCon
 		}
 		System.setProperty("java.rmi.server.hostname", host);
 		
-		//如果配置了身份验证接口
-		if(authenticationInterface !=null){
-			try {
-				Object obj = Class.forName(authenticationInterface).newInstance();
-				if(obj instanceof XSnakeRMIAuthentication){
-					authentication = (XSnakeRMIAuthentication)obj;
-				}else{
-					throw new BeanCreationException("身份验证接口必须实现接口 org.xsnake.remote.XSnakeRMIAuthentication");
-				}
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-				throw new BeanCreationException(e.getMessage());
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				throw new BeanCreationException(e.getMessage());
-			}catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				throw new BeanCreationException(e.getMessage());
-			}
-			
-		}
-		
 		//如果serverId 为空，设置他的地址+端口为服务器标示
 		if(serverId == null){
 			serverId = host + ":" + port;
 		}
-		
-		//初始化拦截器
-		if(interceptors!=null){
-			for(String interceptor : interceptors){
-				try {
-					Object obj = Class.forName(interceptor).newInstance();
-					if(obj instanceof XSnakeInterceptor){
-						interceptorList.add(((XSnakeInterceptor)obj));
-					}else{
-						throw new BeanCreationException("拦截器必须实现接口 org.xsnake.remote.XSnakeInterceptor");
-					}
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-					throw new BeanCreationException(e.getMessage());
-				}catch (IllegalAccessException e) {
-					e.printStackTrace();
-					throw new BeanCreationException(e.getMessage());
-				}catch (ClassNotFoundException e) {
-					e.printStackTrace();
-					throw new BeanCreationException(e.getMessage());
-				}
-				
-			}
-			
-		}
-	
 	}
 
-	private void initZooKeeper() {
-		if(zookeeperAddress !=null){
-			connector = ZookeeperConnector.getConnector(zookeeperAddress,timeout,new Watcher() {
-				public void process(WatchedEvent event) {
-					if (event.getState() == Event.KeeperState.SyncConnected) {
-						publish();
-	                }
-				}
-			});
-		}
-	}
-	
-	private void findRemoteService(ApplicationContext applicationContext, String[] names) {
-		for (String name : names) {
-			Object obj = applicationContext.getBean(name);
-			Object target = ReflectionUtil.getTarget(obj);
-			Remote remote = target.getClass().getAnnotation(Remote.class);
-			if (remote != null) {
-				if(remote.type() == Remote.Type.RMI){
-					serviceBeanList.add(RemoteServiceBean.createServiceBean(obj,target));
-				}else{
-					throw new BeanCreationException(" no support ["
-							+ remote.type()
-							+ "] in the version ! only support RMI type");
-				}
-			}
-		}
-		
-	}
-
-	private void exportService(){
+	protected void exportService(List<RemoteServiceBean> serviceBeanList){
 		RMIServerSocketFactory server = new XSnakeServerSocketFactory(trustAddress,authentication);
 		RMIClientSocketFactory client = new XSnakeClientSocketFactory();
 		for(RemoteServiceBean bean : serviceBeanList){
-			LOG.debug("export service : "+bean.serviceInterface.getName());
+			LOG.debug("export service >> "+ bean.serviceInterface.getName());
 			exportService(bean,server,client);
 		}
 	}
 	
-	public void publish(){
+	public void publish(List<RemoteServiceBean> serviceBeanList){
 		for(RemoteServiceBean bean : serviceBeanList){
 			try {
 				String url = String.format("rmi://%s:%d/%s", host, port, bean.name);
@@ -255,7 +111,7 @@ public class RemoteAccessFactory extends XSnakeContext implements ApplicationCon
 	private void exportService(RemoteServiceBean bean,RMIServerSocketFactory server,RMIClientSocketFactory client){
 		RmiServiceExporter se = new RmiServiceExporter();
 		se.setServiceName(bean.name);
-		Object obj = new XSnakeInterceptorHandler(info,interceptorList).createProxy(bean.proxy);
+		Object obj = new XSnakeInterceptorHandler().createProxy(bean.proxy);
 		se.setService(obj);
 		se.setAlwaysCreateRegistry(alwaysCreateRegistry);
 		alwaysCreateRegistry = false;
@@ -273,10 +129,7 @@ public class RemoteAccessFactory extends XSnakeContext implements ApplicationCon
 	}
 
 	public void destroy(){
-		//关闭ZooKeeper链接资源
-		if(connector!=null){
-			connector.close();
-		}
+		super.destroy();
 		//释放RMI服务
 		for(RmiServiceExporter rmi : rmiServiceExporterList){
 			try {
@@ -285,11 +138,6 @@ public class RemoteAccessFactory extends XSnakeContext implements ApplicationCon
 				e.printStackTrace();
 			}
 		}
-		instance = null;
-	}
-
-	public static RemoteAccessFactory getInstance() {
-		return instance;
 	}
 
 	protected String getLocalHost() {
@@ -320,4 +168,5 @@ public class RemoteAccessFactory extends XSnakeContext implements ApplicationCon
 		}
 		return port;
 	}
+
 }

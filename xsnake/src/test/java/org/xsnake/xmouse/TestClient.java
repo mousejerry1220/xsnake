@@ -2,27 +2,25 @@ package org.xsnake.xmouse;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.xsnake.remote.client.ClientAccessFactory;
 
 public class TestClient {
 
-	//第一种方式
-//	public static void main(String[] args) {
-//		ClientAccessFactory caf = new ClientAccessFactory("192.168.0.241:2181",10);
-//		for(int i =0;i<20;i++){
-//			IRemoteTest obj = caf.getService(IRemoteTest.class);
-//			System.out.println(obj.sayHello(" xsnake " + "    "));
-//		}
-//	}
-	
-	//使用spring的DI方式
+	private static ApplicationContext ctx;
+
 	public static void main(String[] args) {
-		ApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:client-application-context.xml");
-		IRemoteTest remoteTest = (IRemoteTest)ctx.getBean("remoteTest");
-		try {
-			remoteTest.sayHello(" xsnake "); 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		IRemoteTest remoteTest = null;
+		
+		//方式一
+		ctx = new FileSystemXmlApplicationContext("classpath:client-application-context.xml");
+		remoteTest = (IRemoteTest) ctx.getBean("remoteTest");
+		remoteTest.sayHello(" xsnake ");
+
+		//方式二
+		ClientAccessFactory caf = new ClientAccessFactory("127.0.0.1:2181",10);
+		remoteTest = caf.getService(IRemoteTest.class);
+		remoteTest.sayHello(" xsnake ");
+
 	}
-	
+
 }

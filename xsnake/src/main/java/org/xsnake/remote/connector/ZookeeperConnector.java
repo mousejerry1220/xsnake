@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
-/**
+/*
  * 如果设置timeout <= 0 那么客户端会一直阻塞直至连接到ZooKeeper为止。
  * 如果设置timeout > 0 那么客户端会在设置时间后还没有连接到ZooKeeper而抛出java.net.ConnectException的连接异常
  * @author Jerry.Zhao
@@ -217,9 +217,5 @@ public class ZookeeperConnector {
 	public List<String> getChildren(String path) throws KeeperException, InterruptedException {
 		return zooKeeper.getChildren(path, null);
 	}
-
-//	public ZooKeeper getZooKeeper() {
-//		return zooKeeper;
-//	} 
 	
 }
