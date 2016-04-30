@@ -1,4 +1,4 @@
-package org.xsnake.spring;
+package org.xsnake.remote.client;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
