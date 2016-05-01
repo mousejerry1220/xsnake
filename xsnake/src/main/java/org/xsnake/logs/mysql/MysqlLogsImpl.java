@@ -17,8 +17,8 @@ public class MysqlLogsImpl implements XSnakeLogsInterface{
 		new MysqlServerStartupLogs().log();
 	}
 
-	public void log4XSnakeException(Throwable e) {
-		new MysqlXSnakeExceptionLogs(e).log();
+	public void log4XSnakeException(InvokeInfo invokeInfo,Throwable e) {
+		new MysqlXSnakeExceptionLogs(invokeInfo,e).log();
 	}
 
 	public void log4ServerRestart() {
@@ -26,11 +26,11 @@ public class MysqlLogsImpl implements XSnakeLogsInterface{
 	}
 
 	public void log4AuthenticationFailed(Socket s) {
-		
+		new MysqlAuthenticationFailedLogs(s).log();
 	}
 
 	public void log4NotTrustAddress(Socket s) {
-		
+		new MysqlNotTrustAddressLogs(s).log();
 	}
 	
 }

@@ -10,7 +10,7 @@ public interface XSnakeLogsInterface {
 	//当服务启动完成
 	void log4ServerStartup();
 	//当服务层抛出异常
-	void log4XSnakeException(Throwable e);
+	void log4XSnakeException(InvokeInfo invokeInfo,Throwable e);
 	//当服务器重启
 	void log4ServerRestart();
 	//当RMI身份验证失败

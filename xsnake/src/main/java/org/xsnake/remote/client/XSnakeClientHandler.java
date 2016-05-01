@@ -10,7 +10,6 @@ import java.rmi.UnmarshalException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.springframework.remoting.RemoteLookupFailureException;
-import org.xsnake.remote.server.XSnakeContext;
 
 public class XSnakeClientHandler implements InvocationHandler {
 	
@@ -59,9 +58,6 @@ public class XSnakeClientHandler implements InvocationHandler {
 				UndeclaredThrowableException undeclaredThrowable = (UndeclaredThrowableException)e.getTargetException();
 				if(undeclaredThrowable.getUndeclaredThrowable() instanceof InvocationTargetException){
 					Throwable throwable = ((InvocationTargetException)undeclaredThrowable.getUndeclaredThrowable()).getTargetException();
-					if(XSnakeContext.getLogger()!=null){
-						XSnakeContext.getLogger().log4XSnakeException(throwable);
-					}
 					throw throwable;
 				}
 				throw undeclaredThrowable.getUndeclaredThrowable();
