@@ -8,8 +8,6 @@ import org.xsnake.common.BaseDaoUtil;
 
 public abstract class MysqlDatabaseLogs {
 
-	private static ExecutorService service =  Executors.newFixedThreadPool(10);
-	
 	abstract String getCreateTableSQL();
 	
 	abstract String getInsertSQL();
@@ -21,6 +19,7 @@ public abstract class MysqlDatabaseLogs {
 	abstract String getTemplateTableName();
 	
 	public void log(){
+		ExecutorService service =  Executors.newSingleThreadExecutor();
 		Thread t = new Thread(){
 			public void run() {
 				try {
@@ -46,6 +45,6 @@ public abstract class MysqlDatabaseLogs {
 			};
 		};
 		service.execute(t);
+		service.shutdown();
 	}
-	
 }
