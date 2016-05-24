@@ -59,6 +59,7 @@ public class ClientServiceBeanDefinitionParser implements BeanDefinitionParser{
 				}
                 values.addIndexedArgumentValue(1, version);
                 beanDefinition.setConstructorArgumentValues(values);
+                
                 parserContext.getRegistry().registerBeanDefinition(serviceId, beanDefinition);
         		
         	}

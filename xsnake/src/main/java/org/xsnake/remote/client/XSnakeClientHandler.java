@@ -40,7 +40,7 @@ public class XSnakeClientHandler implements InvocationHandler {
 		}catch(InvocationTargetException e){
 			if(e.getTargetException() instanceof RemoteConnectFailureException && 
 					e.getTargetException().getCause() instanceof java.rmi.ConnectIOException){
-				throw new Exception("身份验证失败");
+				throw new Exception("连接失败！");
 			}
 			if(e.getTargetException() instanceof UnmarshalException || //执行中断开连接时代码执行至此
 					(e.getTargetException() instanceof RemoteConnectFailureException )){	//非执行中断开连接时代码执行至此

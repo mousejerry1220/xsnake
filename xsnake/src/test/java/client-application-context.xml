@@ -19,6 +19,6 @@
 	</context:component-scan>
 	
 	<xsnake:client id="clientFactory" zookeeperAddress="127.0.0.1:2181" timeout="15"> 
-		<xsnake:service id="remoteTest" interface="org.xsnake.xmouse.IRemoteTest" />
+		<xsnake:service id="remoteTest" interface="org.xsnake.xmouse.IRemoteTest" version="5" />
 	</xsnake:client>
 </beans>

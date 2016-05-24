@@ -31,6 +31,7 @@ public class XSnakeServerSocket extends ServerSocket {
     public Socket accept() throws IOException {
         Socket s = new Socket();
         implAccept(s);
+        System.out.println("accept------"+Thread.currentThread().getId());
         String serverAddress = InetAddress.getLocalHost().getHostAddress();
         String clientAddress = s.getInetAddress().getHostAddress();
         if(trust && !serverAddress.equals(clientAddress)){

@@ -2,7 +2,7 @@ package org.xsnake.logs.mysql;
 
 import java.net.Socket;
 
-public class MysqlRejectLogs extends MysqlDatabaseLogs{
+public abstract class MysqlRejectLogs extends MysqlDatabaseLogs{
 
 	Socket socket;
 	
@@ -12,7 +12,6 @@ public class MysqlRejectLogs extends MysqlDatabaseLogs{
 	
 	@Override
 	String getCreateTableSQL() {
-
 		return " CREATE TABLE `"+getTemplateTableName()+"` ( "+
 			" `SERVER_ID` varchar(50) DEFAULT NULL, "+
 			" `HOST` varchar(16) DEFAULT NULL, "+
@@ -27,11 +26,6 @@ public class MysqlRejectLogs extends MysqlDatabaseLogs{
 	@Override
 	String getInsertSQL() {
 		return "INSERT INTO `"+getCurrentTableName()+"`(`SERVER_ID`,`HOST`,`PORT`,`TYPE`,`CLIENT_HOST`,`CLIENT_PORT`,`DATETIME`) VALUES (? , ? , ? , ? , ? , ? , ?)";
-	}
-
-	@Override
-	Object[] getArgs() {
-		return null;
 	}
 
 	@Override
