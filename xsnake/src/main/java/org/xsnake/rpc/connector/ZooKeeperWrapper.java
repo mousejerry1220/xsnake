@@ -17,10 +17,6 @@ public class ZooKeeperWrapper {
 	
 	/**
 	 * 创建临时目录
-	 * @param node
-	 * @throws KeeperException
-	 * @throws InterruptedException
-	 * @throws IOException
 	 */
 	public void tempDir(String node) throws KeeperException, InterruptedException, IOException {
 		dir(node, null, CreateMode.EPHEMERAL);
@@ -28,11 +24,6 @@ public class ZooKeeperWrapper {
 	
 	/**
 	 * 创建临时目录及数据
-	 * @param node
-	 * @param data
-	 * @throws KeeperException
-	 * @throws InterruptedException
-	 * @throws IOException
 	 */
 	public void tempDir(String node,String data) throws KeeperException, InterruptedException, IOException {
 		dir(node, data.getBytes(), CreateMode.EPHEMERAL);
@@ -44,10 +35,6 @@ public class ZooKeeperWrapper {
 	
 	/**
 	 * 创建目录
-	 * @param node
-	 * @throws KeeperException
-	 * @throws InterruptedException
-	 * @throws IOException
 	 */
 	public void dir(String node) throws KeeperException, InterruptedException, IOException {
 		dir(node, null, CreateMode.PERSISTENT);
@@ -55,11 +42,6 @@ public class ZooKeeperWrapper {
 
 	/**
 	 * 创建目录及数据
-	 * @param node
-	 * @param data
-	 * @throws KeeperException
-	 * @throws InterruptedException
-	 * @throws IOException
 	 */
 	public void dir(String node,String data) throws KeeperException, InterruptedException, IOException {
 		dir(node, data.getBytes(), CreateMode.PERSISTENT);
@@ -72,12 +54,6 @@ public class ZooKeeperWrapper {
 	
 	/**
 	 * 创建目录及数据，如果目录存在，则更新数据
-	 * @param path
-	 * @param value
-	 * @param createMode
-	 * @throws KeeperException
-	 * @throws InterruptedException
-	 * @throws IOException
 	 */
 	public void dir(String path,byte[] data,CreateMode createMode)throws KeeperException, InterruptedException, IOException{
 		if(!_zooKeeper.getState().isConnected()){
@@ -92,10 +68,6 @@ public class ZooKeeperWrapper {
 	
 	/**
 	 * 获取目录数据
-	 * @param path
-	 * @return
-	 * @throws KeeperException
-	 * @throws InterruptedException
 	 */
 	public byte[] dirData(String path) throws KeeperException, InterruptedException{
 		byte[] data = _zooKeeper.getData(path, null, null);
@@ -108,10 +80,6 @@ public class ZooKeeperWrapper {
 	
 	/**
 	 * 判断是否存在
-	 * @param path
-	 * @return
-	 * @throws KeeperException
-	 * @throws InterruptedException
 	 */
 	public boolean exists(String path) throws KeeperException, InterruptedException{
 		return _zooKeeper.exists(path, null)!=null;
