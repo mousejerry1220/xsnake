@@ -1,5 +1,5 @@
 ## XSnake用途
-XSnake提供发布、调用远程服务的JAVA工具，可以快速搭建高可用性的分布式系统。
+XSnake可快速搭建高可用性的分布式系统及REST服务。
 ***
 ### 免费获取XSnake
 ```
@@ -163,7 +163,7 @@ public class RestTestImpl implements IRestTest{
 	
 	@Override
 	public String sayHello(String inputName, int age) {
-		return  " type:2, name: "+ inputName+ "  ，   age :  "+age ;
+		return  " type:2, name: "+ inputName+ "  ,   age :  "+age ;
 	}
 }
 ```
@@ -222,6 +222,8 @@ public class TestRest {
 ###### 打开浏览器输入：http://localhost:12345/test/jerry/18
 ###### 返回结果 type:1, name: jerry , age : 18
 ###### 打开浏览器输入：http://localhost:12345/test?name=jerry&age=18
-###### 返回结果 type:2, name: jerry ， age : 18
+###### 返回结果 type:2, name: jerry , age : 18
 ***
+### 提示
+- XSnake只需要对接口进行注解即可。完全不需要修改实现类
 ###### 技术讨论与建议意见请联系 mousejerry1220#gmail.com (#->@)
