@@ -38,7 +38,7 @@
 		<connection>scm:git:git@github.com:mousejerry1220/xsnake.git</connection>
 		<developerConnection>scm:git:git@github.com:mousejerry1220/xsnake.git</developerConnection>
 		<url>git@github.com:mousejerry1220/xsnake.git</url>
-    	<tag>xsnake-1.90</tag>
+    	<tag>xsnake-1.90-RELEASE</tag>
   	</scm>
 
 	<build>
