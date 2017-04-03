@@ -1,6 +1,15 @@
 ## XSnake用途
 XSnake提供发布、调用远程服务的JAVA工具，可以快速搭建高可用性的分布式系统。
 ***
+### 免费获取XSnake
+```
+<dependency>
+	<groupId>org.xsnake</groupId>
+	<artifactId>xsnake</artifactId>
+	<version>1.90</version>
+</dependency>
+```
+***
 ### XSnake原理
 ###### 服务端：基于Spring提供的bean管理，使用RMI做RPC基础，通过ZooKeeper做服务的注册与发现。
 ###### 客户端：通过JDK代理方式建立远程RMI连接
