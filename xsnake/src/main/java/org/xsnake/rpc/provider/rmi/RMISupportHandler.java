@@ -92,25 +92,13 @@ public class RMISupportHandler implements ZooKeeperExpiredCallBack{
 		printLogo();
 	}
 	
-	
 	private void printLogo(){
-		System.out.println("  ,@@     @!     @   #@@                               @");                                               
-		System.out.println("   @@     #     @     .@                               @");                                               
-		System.out.println("    @    ;     @       #                               @");                                               
-		System.out.println("    @@   @     @        ,                              @");                                               
-		System.out.println("     @  ;      @.                                      @");                                               
-		System.out.println("     @# @      @@          -;@  ,@@:        ;@@;       @    ;;;;       $@!");                            
-		System.out.println("     .@:        @@@          @ @:  #@     @!    @,     @     @*      @:   @* ");                           
-		System.out.println("      @@         ;@@@        @@     @    !@     ,@     @    #       *=     @-");                           
-		System.out.println("      :@           :@@@      @      @.    @     .@     @   =.       @      $@");                           
-		System.out.println("      @@=            *@@     @      @.        ,-@@     @  !:       -@      :@");                           
-		System.out.println("     ..;@              @$    @      @.     $@@  .@     @ !@@       #@@@@@@@@@");                           
-		System.out.println("     @  @;             ~@    @      @.    @=    .@     @=; @#      #@        ");                           
-		System.out.println("    -   $@     -        @    @      @.   @@     .@     @!   @.     *@        ");                           
-		System.out.println("    @    @~    @        @    @      @.   @~     .@     @    *@      @        ");                           
-		System.out.println("   .,    $@    @,      #!    @      @.   @~     .@     @     @#     @$      !");    
-		System.out.println("   @      @-   @@-     @     @      @.   @@    .#@ -   @      @.     @;    @ ");                           
-		System.out.println(" $@@@    @@@@  ~ .@@@@*    !@@@@  .@@@@   $@@@@  @@  ,@@@@   @@@@     @@@@# ");
+		System.err.println("__   __ _____             _");
+		System.err.println("\\ \\ / //  ___|           | | ");
+		System.err.println(" \\ V / \\ `--. _ __   __ _| | _____");
+		System.err.println(" /   \\  `--. \\ '_ \\ / _` | |/ / _ \\");
+		System.err.println("/ /^\\ \\/\\__/ / | | | (_| |   <  __/");
+		System.err.println("\\/   \\/\\____/|_| |_|\\__,_|_|\\_\\___|");
 	}
 
 	protected String getLocalHost() {
@@ -120,8 +108,26 @@ public class RMISupportHandler implements ZooKeeperExpiredCallBack{
 			e.printStackTrace();
 			throw new BeanCreationException("创建对象失败，无法自动获取主机地址，请配置");
 		}
-		
 	}
+	
+	
+//	
+//	__   __//\//\//\//\//\/  _    _____ 
+//	\ \ / ///\//\//\//\//\/ | |  |  _  |
+//	 \ V /   ___ _ __   __ _| | _| | | |
+//	 /   \  / __| '_ \ / _` | |/ / | | |
+//	/ /^\ \ \__ \ | | | (_| |   <\ \_/ /
+//	\/   \/ |___/_| |_|\__,_|_|\_\\___/ 
+//	                                                       
+                                                 
+//	__   __/\//\//\//\//\  _    _____  
+//	\ \ / //\//\//\//\//\ | |  |  _  | 
+//	 \ V / ___ _ __   __ _| | _| | | |       
+//	 /   \/ __| '_ \ / _` | |/ / | | |       
+//	/ /^\ \__ \ | | | (_| |   <\ \_/ /       
+//	\/   \/___/_| |_|\__,_|_|\_\\___/        
+//	                                         
+	
 	
 	/**
 	 * 顺序获取可用的端口 
