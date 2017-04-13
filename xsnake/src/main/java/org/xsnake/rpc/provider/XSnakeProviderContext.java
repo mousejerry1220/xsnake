@@ -57,8 +57,7 @@ public class XSnakeProviderContext implements ApplicationContextAware {
 		
 		//调用记录更新线程
 		new MethodMonitorUpdator(this).start();
-		
-		System.out.println("=======初始化结束=======");
+		System.out.println("=======服务端初始化结束=======");
 	}
 
 	private String getLocalHost() {

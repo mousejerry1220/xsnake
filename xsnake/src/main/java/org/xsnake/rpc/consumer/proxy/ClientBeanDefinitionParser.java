@@ -30,7 +30,6 @@ public class ClientBeanDefinitionParser extends BaseParser implements BeanDefini
 	private int scanResultCount = 0;
 	
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		
 		parseKevValueParamter(element);
 		
 		//扫描包，获得需要初始的远程接口
@@ -54,7 +53,7 @@ public class ClientBeanDefinitionParser extends BaseParser implements BeanDefini
 		values.addIndexedArgumentValue(0,propertyMap);
 		clientBeanDefinition.setConstructorArgumentValues(values);
 		parserContext.getRegistry().registerBeanDefinition(XSnakeProxyFactory.class.getName(), clientBeanDefinition);
-
+		
 		for(Class<?> interFace : interfaceList){
 			RootBeanDefinition beanDefinition = new RootBeanDefinition();
 			beanDefinition.setFactoryBeanName(XSnakeProxyFactory.class.getName());

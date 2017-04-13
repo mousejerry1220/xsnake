@@ -89,6 +89,7 @@ public class RMISupportHandler implements ZooKeeperExpiredCallBack{
 		}
 		
 		export(context);
+		
 		printLogo();
 	}
 	
@@ -109,25 +110,6 @@ public class RMISupportHandler implements ZooKeeperExpiredCallBack{
 			throw new BeanCreationException("创建对象失败，无法自动获取主机地址，请配置");
 		}
 	}
-	
-	
-//	
-//	__   __//\//\//\//\//\/  _    _____ 
-//	\ \ / ///\//\//\//\//\/ | |  |  _  |
-//	 \ V /   ___ _ __   __ _| | _| | | |
-//	 /   \  / __| '_ \ / _` | |/ / | | |
-//	/ /^\ \ \__ \ | | | (_| |   <\ \_/ /
-//	\/   \/ |___/_| |_|\__,_|_|\_\\___/ 
-//	                                                       
-                                                 
-//	__   __/\//\//\//\//\  _    _____  
-//	\ \ / //\//\//\//\//\ | |  |  _  | 
-//	 \ V / ___ _ __   __ _| | _| | | |       
-//	 /   \/ __| '_ \ / _` | |/ / | | |       
-//	/ /^\ \__ \ | | | (_| |   <\ \_/ /       
-//	\/   \/___/_| |_|\__,_|_|\_\\___/        
-//	                                         
-	
 	
 	/**
 	 * 顺序获取可用的端口 
@@ -213,6 +195,7 @@ public class RMISupportHandler implements ZooKeeperExpiredCallBack{
 				}
 			}
 		}
+		
 	}
 
 	public ZooKeeperWrapper getZooKeeper() {

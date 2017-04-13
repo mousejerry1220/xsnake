@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,11 +41,11 @@ public class RestFilter {
 		}
 		String uri = request.getRequestURI();
 		
-		RestRequestObject restRequestObject = new RestRequestObject();
-		restRequestObject.setHttpMethod(request.getMethod().toUpperCase());
-		restRequestObject.setParamters(dataMap);
-		restRequestObject.setPath(uri);
-		TargetMethod targetMethod = RestPathService.getInstance().findTargetMethod(restRequestObject.toString(), dataMap);
+		RestRequest restRequest = new RestRequest();
+		restRequest.setHttpMethod(request.getMethod().toUpperCase());
+		restRequest.setParamters(dataMap);
+		restRequest.setPath(uri);
+		TargetMethod targetMethod = RestService.getInstance().findTargetMethod(restRequest.toString(), dataMap);
 		if(targetMethod == null){
 			response.sendError(404);
 			return null;
