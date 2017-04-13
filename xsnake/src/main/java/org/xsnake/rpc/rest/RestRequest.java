@@ -3,7 +3,7 @@ package org.xsnake.rpc.rest;
 import java.io.Serializable;
 import java.util.Map;
 
-public class RestRequestObject implements Serializable {
+public class RestRequest implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

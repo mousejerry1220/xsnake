@@ -14,4 +14,5 @@ public interface IRestTest {
 	
 	@Rest(value="/test")
 	String sayHello(@RequestParam(name="name") String inputName,@RequestParam(name="age") int age);
+	
 }

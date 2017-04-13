@@ -5,15 +5,18 @@ import java.util.Map;
 
 import org.springframework.util.AntPathMatcher;
 
-public class RestPathService {
+public class RestService {
 
-	static RestPathService instance;
+	private static RestService instance;
 	
 	public List<TargetMethod> targetList;
 	
-	public RestPathService(List<TargetMethod> targetList){
+	public RestService(List<TargetMethod> targetList){
 		this.targetList = targetList;
 		instance = this;
+		RestServer.run();
+		System.out.println("=======REST初始化结束=======");
+		System.out.println("=======REST服务端口："+RestServer.getRestServer().getPort()+"=======");
 	}
 	
 	AntPathMatcher antPathMatcher = new AntPathMatcher();
@@ -29,7 +32,7 @@ public class RestPathService {
 		return null;
 	}
 
-	public static RestPathService getInstance() {
+	public static RestService getInstance() {
 		return instance;
 	}
 	

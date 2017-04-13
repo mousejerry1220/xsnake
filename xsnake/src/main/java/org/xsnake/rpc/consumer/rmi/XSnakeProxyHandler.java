@@ -19,6 +19,7 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.remoting.RemoteConnectFailureException;
+import org.springframework.remoting.RemoteLookupFailureException;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.xsnake.rpc.connector.ZooKeeperWrapper;
 
@@ -129,17 +130,28 @@ public class XSnakeProxyHandler implements InvocationHandler {
 				continue;
 			}
 			
-			RmiProxyFactoryBean c = new RmiProxyFactoryBean();
-			c.setServiceInterface(interfaceService);
-			c.setServiceUrl(rmiPath);
-			c.afterPropertiesSet();
-			Object target = c.getObject();
-			newTargetMap.put(node, target);
+			Object proxy = getRMIProxy(rmiPath);
+			if(proxy!=null){
+				newTargetMap.put(node, proxy);
+			}
 		}
 		targetMap = newTargetMap;
 		targetNodeList = list;
 	}
 
+	public Object getRMIProxy(String rmiPath){
+		Object rmiObject = null;
+		try{
+			RmiProxyFactoryBean c = new RmiProxyFactoryBean();
+			c.setServiceInterface(interfaceService);
+			c.setServiceUrl(rmiPath);
+			c.afterPropertiesSet();
+			rmiObject = c.getObject();
+		}catch(RemoteLookupFailureException e){
+		}
+		return rmiObject;
+	}
+	
 	public Object createProxy() {
 		Object proxy = Proxy.newProxyInstance(XSnakeProxyHandler.class.getClassLoader(),
 				new Class[]{interfaceService}, this);
