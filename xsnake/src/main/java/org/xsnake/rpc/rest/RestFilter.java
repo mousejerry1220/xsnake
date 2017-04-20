@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.xsnake.rpc.common.ParameterDiscoverer;
 import org.xsnake.rpc.consumer.rmi.XSnakeProxyHandler;
 
+import com.alibaba.fastjson.JSON;
+
 @RestController
 public class RestFilter {
 	
@@ -56,7 +58,10 @@ public class RestFilter {
 			parameterDiscoverer.getParameterNames(targetMethod.getClazz(),targetMethod.getMethod(),dataMap,args);
 			result = method.invoke(obj, args.toArray());
 		}
-		return result;
+		if(result instanceof String){
+			return result;
+		}
+		return JSON.toJSONString(result);
 	}
 	
 }
