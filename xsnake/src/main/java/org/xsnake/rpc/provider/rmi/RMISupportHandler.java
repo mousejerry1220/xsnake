@@ -164,6 +164,7 @@ public class RMISupportHandler implements ZooKeeperExpiredCallBack{
 						se.afterPropertiesSet();
 						flag = false;
 						String url = String.format("rmi://%s:%d/%s", host, port, nodeName);
+						System.out.println(url);
 						handlerList.add(handler);
 						rmiServiceExporterList.add(se);
 						try {

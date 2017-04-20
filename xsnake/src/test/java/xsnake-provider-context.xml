@@ -23,6 +23,9 @@
    		<property name="registry.application" value="MyPrjectA" />
    		<!-- 最大并发数 -->
    		<property name="registry.maxThread" value="100" />
+   		
+   		<property name="registry.rmiHost" value="127.0.0.1" />
+   		
 		<!-- 监控间隔 -->
    		<property name="registry.monitorInterval" value="60" />
    		<!-- 服务运行的环境，用于区分开发，测试，生产等不同环境 -->
