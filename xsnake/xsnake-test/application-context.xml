@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsnake="http://www.xsnake.org/schema/xsnake"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd"
+	>
+	
+	<context:component-scan base-package="org.xsnake" >
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+	
+   	<bean id="xsnake" class="org.xsnake.rpc.provider.XSnakeProviderContext">
+   		<property name="registry.zooKeeper" value="127.0.0.1:2181" />
+   		<property name="registry.application" value="aaaa" />
+   		<property name="registry.rmiMode" value="true" />
+   		<property name="registry.maxThread" value="100" />
+   		<property name="registry.monitorInterval" value="5" />
+   		<property name="registry.environment" value="test" />
+   	</bean>
+	<import resource="application-context2.xml" />
+	
+</beans>

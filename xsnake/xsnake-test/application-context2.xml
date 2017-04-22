@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsnake="http://www.xsnake.org/schema/xsnake"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+	http://www.xsnake.org/schema/xsnake
+	http://www.xsnake.org/schema/xsnake/xsnake.xsd">
+
+<!-- 	<context:component-scan base-package="org.xsnake" > -->
+<!-- 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" /> -->
+<!-- 	</context:component-scan> -->
+
+	<xsnake:rest>
+		<xsnake:propertys>
+			<!-- 提供服务的接口所在的包，多个可以使用英文分号做分隔 （必须的参数）-->
+			<xsnake:property name="scanPackage" value="org.xsnake" />
+			<!-- 启动时初始连接，如果超时则启动失败 （秒）-->
+			<xsnake:property name="initTimeout" value="5" />
+			<!-- zooKeeper 所在的地址 （必须的参数）-->
+			<xsnake:property name="zooKeeper" value="127.0.0.1:2181" />
+			<!-- 环境，同一个接口可能存在多个环境中，指定连接的环境 （默认为"test"）-->
+			<xsnake:property name="environment" value="test" />
+			<!-- 失败后重试间隔次数-->
+			<xsnake:property name="retry" value="10" />
+			<!-- 失败后重试间隔时间（毫秒）-->
+			<xsnake:property name="retryInterval" value="500" />
+		</xsnake:propertys>
+	</xsnake:rest>
+
+</beans>

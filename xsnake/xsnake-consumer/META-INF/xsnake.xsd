@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.xsnake.org/schema/xsnake"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xsnake.org/schema/xsnake">
+	
+	<xsd:element name="client">
+		<xsd:complexType mixed="true">
+			<xsd:sequence>
+				<xsd:element ref="propertys" minOccurs="0" maxOccurs="unbounded"> </xsd:element>
+				<xsd:element ref="services" minOccurs="0" maxOccurs="unbounded"> </xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="rest">
+		<xsd:complexType mixed="true">
+			<xsd:sequence>
+				<xsd:element ref="propertys" minOccurs="0" maxOccurs="unbounded"> </xsd:element>
+				<xsd:element ref="services" minOccurs="0" maxOccurs="unbounded"> </xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="services">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="service" minOccurs="0" maxOccurs="unbounded"> </xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="service">
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="required"></xsd:attribute>
+			<xsd:attribute name="interface" type="xsd:string" use="required"></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="propertys">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="property" minOccurs="0" maxOccurs="unbounded"> </xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="property">
+		<xsd:complexType mixed="true">
+			<xsd:attribute name="name" type="xsd:string" use="required"></xsd:attribute>
+			<xsd:attribute name="value" type="xsd:string" ></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="value">
+		
+	</xsd:element>
+</xsd:schema>
