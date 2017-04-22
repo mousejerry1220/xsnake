@@ -1,15 +1,12 @@
 package org.xsnake.rpc.consumer.proxy;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 import org.xsnake.rpc.annotation.RequestMethod;
 import org.xsnake.rpc.annotation.Rest;
@@ -29,10 +26,9 @@ public class RestBeanDefinitionParser extends ClientBeanDefinitionParser impleme
 		for(Class<?> interFace : interfaceList){
 			initRestService(interFace);
 		}
-
 		
-		RestServer r = new RestServer();
-		r.run();
+		RestServer.run();
+		System.out.println("REST 服务端口："+RestServer.getRestServer().getPort());
 		new RestPathService(targetList);
 		
 		return null;

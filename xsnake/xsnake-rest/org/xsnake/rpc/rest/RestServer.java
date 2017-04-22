@@ -14,16 +14,25 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class RestServer {
 
+	static RestServer restServer;
+	
 	public RestServer(){
+		restServer = this;
 	}
 	
-	public void run(){
+	int port;
+	
+	public static void run(){
 		SpringApplication.run(RestServer.class);
 	}
 	
+	public static RestServer getRestServer() {
+		return restServer;
+	}
+
 	@Bean
 	public EmbeddedServletContainerFactory servletContainer(){
-		int port = getPort(12345);
+		port = getPort(12345);
 		AbstractEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
 		factory.setPort(port);
 		Compression c = new Compression();
@@ -31,7 +40,6 @@ public class RestServer {
 		c.setMimeTypes(new String[]{"text/json","text/html","text/xml","text/javascript","text/css","text/plain"});
 		c.setMinResponseSize(256);
 		factory.setCompression(c);
-		System.out.println("REST PORT : "+port);
 		return factory;
 	}
 	
@@ -53,4 +61,9 @@ public class RestServer {
 		}
 		return port;
 	}
+
+	public int getPort() {
+		return port;
+	}
+	
 }

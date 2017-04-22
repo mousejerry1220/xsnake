@@ -53,10 +53,9 @@ public class XSnakeProviderContext implements ApplicationContextAware {
 		**/
 		
 		//RMI远程调用模式
-		if(registry.rmiMode){
-			rmiSupportHandler= new RMISupportHandler(this);
-		}
+		rmiSupportHandler= new RMISupportHandler(this);
 		
+		//调用记录更新线程
 		new MethodMonitorUpdator(this).start();
 		
 		System.out.println("=======初始化结束=======");

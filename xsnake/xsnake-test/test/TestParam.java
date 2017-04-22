@@ -1,4 +1,4 @@
-package org.xsnake.rpc.test;
+package test;
 
 import java.io.Serializable;
 
@@ -8,7 +8,7 @@ public class TestParam implements Serializable{
 
 	String name;
 
-	String aaa;
+	int age;
 	
 	public String getName() {
 		return name;
@@ -18,11 +18,12 @@ public class TestParam implements Serializable{
 		this.name = name;
 	}
 
-	public String getAaa() {
-		return aaa;
+	public int getAge() {
+		return age;
 	}
 
-	public void setAaa(String aaa) {
-		this.aaa = aaa;
+	public void setAge(int age) {
+		this.age = age;
 	}
+	
 }
