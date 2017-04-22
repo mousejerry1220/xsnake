@@ -9,16 +9,14 @@
 	http://www.springframework.org/schema/mvc 
 	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
 	http://www.xsnake.org/schema/xsnake
-	http://www.xsnake.org/schema/xsnake/xsnake.xsd">
+	http://www.xsnake.org/schema/xsnake/xsnake.xsd"
+	
+	>
 
-<!-- 	<context:component-scan base-package="org.xsnake" > -->
-<!-- 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" /> -->
-<!-- 	</context:component-scan> -->
-
-	<xsnake:rest>
+	<xsnake:client>
 		<xsnake:propertys>
 			<!-- 提供服务的接口所在的包，多个可以使用英文分号做分隔 （必须的参数）-->
-			<xsnake:property name="scanPackage" value="org.xsnake" />
+			<xsnake:property name="scanPackage" value="test" />
 			<!-- 启动时初始连接，如果超时则启动失败 （秒）-->
 			<xsnake:property name="initTimeout" value="5" />
 			<!-- zooKeeper 所在的地址 （必须的参数）-->
@@ -30,6 +28,6 @@
 			<!-- 失败后重试间隔时间（毫秒）-->
 			<xsnake:property name="retryInterval" value="500" />
 		</xsnake:propertys>
-	</xsnake:rest>
+	</xsnake:client>
 
 </beans>

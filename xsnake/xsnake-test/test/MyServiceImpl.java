@@ -1,4 +1,4 @@
-package org.xsnake.rpc.test;
+package test;
 
 import org.springframework.stereotype.Service;
 

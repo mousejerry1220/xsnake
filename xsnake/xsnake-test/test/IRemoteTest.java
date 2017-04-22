@@ -1,4 +1,4 @@
-package org.xsnake.rpc.test;
+package test;
 
 import org.xsnake.rpc.annotation.Remote;
 import org.xsnake.rpc.annotation.Rest;

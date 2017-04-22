@@ -65,12 +65,6 @@ public class RegistryConfig implements Serializable{
 	String messageQueue;
 	
 	/**
-	 * java RMI调用方式 
-	 */
-	boolean rmiMode = true;
-	
-	
-	/**
 	 * rest客户端，主要提供转发服务
 	 */
 	boolean restClient = false;
@@ -180,14 +174,6 @@ public class RegistryConfig implements Serializable{
 
 	public void setEnvironment(String environment) {
 		this.environment = environment;
-	}
-
-	public boolean isRmiMode() {
-		return rmiMode;
-	}
-
-	public void setRmiMode(boolean rmiMode) {
-		this.rmiMode = rmiMode;
 	}
 
 	public String getRmiHost() {
