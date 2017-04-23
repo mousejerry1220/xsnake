@@ -11,23 +11,6 @@
 	http://www.xsnake.org/schema/xsnake
 	http://www.xsnake.org/schema/xsnake/xsnake.xsd">
 
-	<context:component-scan base-package="test" >
-		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
-	</context:component-scan>
-	
-   	<bean id="xsnake" class="org.xsnake.rpc.provider.XSnakeProviderContext">
-   		<!-- zooKeeper连接地址 -->
-   		<property name="registry.zooKeeper" value="127.0.0.1:2181" />
-   		<!-- 给服务起名用于监控 -->
-   		<property name="registry.application" value="MyPrjectA" />
-   		<!-- 最大并发数 -->
-   		<property name="registry.maxThread" value="100" />
-		<!-- 监控间隔 -->
-   		<property name="registry.monitorInterval" value="60" />
-   		<!-- 服务运行的环境，用于区分开发，测试，生产等不同环境 -->
-   		<property name="registry.environment" value="test" />
-   	</bean>
-
 	<xsnake:rest>
 		<xsnake:propertys>
 			<!-- 提供服务的接口所在的包，多个可以使用英文分号做分隔 （必须的参数）-->
